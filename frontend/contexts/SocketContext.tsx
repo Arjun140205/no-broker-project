@@ -1,81 +1,80 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useAuth } from '../hooks/useAuth';
-import { DirectMessage } from '../types';
+import { useAuth } from './AuthContext';
 
 interface SocketContextType {
   socket: Socket | null;
   isConnected: boolean;
+  connect: () => void;
+  disconnect: () => void;
   sendMessage: (receiverId: string, content: string) => void;
   onlineUsers: Set<string>;
 }
 
-const SocketContext = createContext<SocketContextType>({
-  socket: null,
-  isConnected: false,
-  sendMessage: () => {},
-  onlineUsers: new Set<string>()
-});
-
-export const useSocket = () => useContext(SocketContext);
+const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
 interface SocketProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const { user, isAuthenticated } = useAuth();
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
 
-  // Initialize socket connection
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      // Connect to socket server
-      const socketInstance = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000', {
-        withCredentials: true,
-        extraHeaders: {
-          "Content-Type": "application/json"
-        }
-      });
+  const connect = () => {
+    if (!isAuthenticated || socket) return;
 
-      // Set up event listeners
-      socketInstance.on('connect', () => {
-        console.log('Socket connected!');
-        setIsConnected(true);
-        
-        // Authenticate with the socket server
-        socketInstance.emit('authenticate', user.id);
-      });
+    const newSocket = io('http://localhost:4001', {
+      auth: {
+        token: localStorage.getItem('token')
+      }
+    });
 
-      socketInstance.on('disconnect', () => {
-        console.log('Socket disconnected!');
-        setIsConnected(false);
-      });
+    newSocket.on('connect', () => {
+      console.log('Connected to server');
+      setIsConnected(true);
       
-      socketInstance.on('user_status_change', ({ userId, status }) => {
-        setOnlineUsers(prev => {
-          const newSet = new Set(prev);
-          if (status === 'online') {
-            newSet.add(userId);
-          } else {
-            newSet.delete(userId);
-          }
-          return newSet;
-        });
+      // Authenticate with the server
+      if (user) {
+        newSocket.emit('authenticate', user.id);
+      }
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Disconnected from server');
+      setIsConnected(false);
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+      setIsConnected(false);
+    });
+
+    newSocket.on('user_status_change', ({ userId, status }: { userId: string; status: string }) => {
+      setOnlineUsers(prev => {
+        const newSet = new Set(prev);
+        if (status === 'online') {
+          newSet.add(userId);
+        } else {
+          newSet.delete(userId);
+        }
+        return newSet;
       });
+    });
 
-      setSocket(socketInstance);
+    setSocket(newSocket);
+  };
 
-      // Clean up on unmount
-      return () => {
-        socketInstance.disconnect();
-      };
+  const disconnect = () => {
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      setIsConnected(false);
     }
-  }, [isAuthenticated, user]);
+  };
 
-  // Function to send a message
   const sendMessage = (receiverId: string, content: string) => {
     if (socket && isConnected && user) {
       socket.emit('send_message', {
@@ -88,11 +87,25 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
   };
 
-  const value = {
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      connect();
+    } else {
+      disconnect();
+    }
+
+    return () => {
+      disconnect();
+    };
+  }, [isAuthenticated, user]);
+
+  const value: SocketContextType = {
     socket,
     isConnected,
+    connect,
+    disconnect,
     sendMessage,
-    onlineUsers
+    onlineUsers,
   };
 
   return (
@@ -100,4 +113,12 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       {children}
     </SocketContext.Provider>
   );
+};
+
+export const useSocket = (): SocketContextType => {
+  const context = useContext(SocketContext);
+  if (context === undefined) {
+    throw new Error('useSocket must be used within a SocketProvider');
+  }
+  return context;
 };
