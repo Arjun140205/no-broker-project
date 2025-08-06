@@ -14,6 +14,8 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
+// Placeholder for getUserChats - implementation moved below
+
 // 📩 1. POST /chat/:propertyId - Start or continue a chat between buyer and property owner
 export const startOrContinueChat = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -155,7 +157,7 @@ export const startOrContinueChat = async (req: AuthenticatedRequest, res: Respon
     }
 
     res.status(200).json({
-      message: chat.messages.length === 0 ? 'New chat started' : 'Existing chat retrieved',
+      message: !chat.messages?.[0] ? 'New chat started' : 'Existing chat retrieved',
       chat,
     });
   } catch (error) {
