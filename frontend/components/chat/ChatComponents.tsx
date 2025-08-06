@@ -1,6 +1,6 @@
 import React from 'react';
 import { User, DirectMessage, ChatUser } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
 
 interface MessageProps {
