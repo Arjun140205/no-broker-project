@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { PropertyFormData } from '../../types';
 import { propertyAPI } from '../../services/api';
 import toast from 'react-hot-toast';
