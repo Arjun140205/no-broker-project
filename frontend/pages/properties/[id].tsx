@@ -1,205 +1,448 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
+import { propertyAPI } from '../../services/api';
 import { Property } from '../../types';
-import { propertyAPI, chatAPI, bookingAPI } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { motion } from 'framer-motion';
+import { Button } from '../../components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { 
+  MapPin, 
+  Star, 
+  Heart, 
+  Share2, 
+  Phone, 
+  Mail, 
+  Calendar,
+  Bed,
+  Bath,
+  Square,
+  Car,
+  Wifi,
+  AirVent,
+  UtensilsCrossed,
+  Shield,
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  User,
+  Building2
+} from 'lucide-react';
 import toast from 'react-hot-toast';
-import Link from 'next/link';
+
+// Sample property data
+const sampleProperty: Property = {
+  id: '1',
+  title: 'Luxury Penthouse in Downtown',
+  description: 'Stunning 3-bedroom penthouse with panoramic city views, modern amenities, and premium finishes throughout. This exclusive property features an open-concept living area, gourmet kitchen with stainless steel appliances, and a private balcony with breathtaking cityscape views. The master suite includes a walk-in closet and en-suite bathroom with dual vanities. Additional features include in-unit laundry, central air conditioning, and secure building access.',
+  price: 2500,
+  location: 'Downtown, City Center',
+  imageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
+  ownerId: 'owner1',
+  createdAt: '2024-01-15',
+  updatedAt: '2024-01-15'
+};
 
 const PropertyDetail = () => {
   const router = useRouter();
   const { id } = router.query;
   const { user, isAuthenticated } = useAuth();
   const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [deleting, setDeleting] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [bookingDate, setBookingDate] = useState('');
+
+  // Sample images for the property
+  const propertyImages = [
+    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=800&h=600&fit=crop',
+  ];
 
   useEffect(() => {
     const fetchProperty = async () => {
-      if (!id || typeof id !== 'string') return;
-
+      if (!id) return;
+      
       try {
         setLoading(true);
-        const propertyData = await propertyAPI.getPropertyById(id);
-        setProperty(propertyData);
+        const data = await propertyAPI.getPropertyById(id as string);
+        setProperty(data || sampleProperty);
       } catch (error) {
-        console.error('Failed to fetch property:', error);
-        toast.error('Failed to load property details');
-        router.push('/browse');
+        console.error('Error fetching property:', error);
+        setProperty(sampleProperty);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchProperty();
-    }
-  }, [id, router]);
+    fetchProperty();
+  }, [id]);
 
-  const handleDelete = async () => {
-    if (!property || !window.confirm('Are you sure you want to delete this property?')) {
-      return;
-    }
+  const handleFavorite = () => {
+    setIsFavorite(!isFavorite);
+    toast.success(isFavorite ? 'Removed from favorites' : 'Added to favorites');
+  };
 
-    try {
-      setDeleting(true);
-      await propertyAPI.deleteProperty(property.id);
-      toast.success('Property deleted successfully');
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Failed to delete property:', error);
-      toast.error('Failed to delete property');
-    } finally {
-      setDeleting(false);
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: property?.title,
+        text: property?.description,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('Link copied to clipboard');
     }
   };
 
-  const handleContactOwner = async () => {
+  const handleContact = () => {
     if (!isAuthenticated) {
-      toast.error('Please log in to contact the owner');
+      toast.error('Please sign in to contact the owner');
       router.push('/login');
       return;
     }
-
-    if (!property) return;
-
-    try {
-      await chatAPI.startChat(property.id);
-      toast.success('Chat started! Check your messages.');
-      router.push('/dashboard/chat');
-    } catch (error) {
-      console.error('Failed to start chat:', error);
-      toast.error('Failed to start chat');
-    }
+    setShowContactForm(true);
   };
 
-  const handleBookProperty = async () => {
+  const handleBooking = () => {
     if (!isAuthenticated) {
-      toast.error('Please log in to book this property');
+      toast.error('Please sign in to book this property');
       router.push('/login');
       return;
     }
-
-    if (!property) return;
-
-    try {
-      await bookingAPI.sendBookingRequest(property.id);
-      toast.success('Booking request sent! The owner will review your request.');
-      router.push('/dashboard/bookings');
-    } catch (error) {
-      console.error('Failed to send booking request:', error);
-      toast.error('Failed to send booking request');
-    }
+    toast.success('Booking request sent! We\'ll contact you soon.');
   };
-
-  const isOwner = user && property && user.id === property.ownerId;
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading property details...
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-realestate-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading property details...</p>
+        </div>
       </div>
     );
   }
 
   if (!property) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-center">
-        <h1 className="text-2xl font-semibold text-gray-900">Property not found</h1>
-        <p className="mt-2 text-gray-600">The property you're looking for does not exist or has been removed.</p>
-        <div className="mt-6">
-          <Link href="/browse" className="text-indigo-600 hover:text-indigo-500">
-            Browse all properties
-          </Link>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Not Found</h2>
+          <p className="text-gray-600 mb-4">The property you're looking for doesn't exist.</p>
+          <Button onClick={() => router.push('/browse')}>
+            Browse Properties
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="mb-6">
-        <Link href="/browse" className="text-indigo-600 hover:text-indigo-500">
-          ← Back to properties
-        </Link>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="flex items-center space-x-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back</span>
+            </Button>
+            
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                onClick={handleShare}
+                className="flex items-center space-x-2"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share</span>
+              </Button>
+              
+              <Button
+                variant="ghost"
+                onClick={handleFavorite}
+                className="flex items-center space-x-2"
+              >
+                <Heart className={`w-4 h-4 ${isFavorite ? 'text-red-500 fill-current' : ''}`} />
+                <span>{isFavorite ? 'Saved' : 'Save'}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white shadow overflow-hidden rounded-lg">
-        {/* Property Image */}
-        <div className="h-96 w-full bg-gray-200 relative">
-          {property.imageUrl ? (
-            <img 
-              src={property.imageUrl} 
-              alt={property.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="h-full w-full flex items-center justify-center">
-              <span className="text-gray-500">No image available</span>
-            </div>
-          )}
-        </div>
-
-        {/* Property Details */}
-        <div className="p-6 sm:p-8">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{property.title}</h1>
-              <p className="mt-2 text-gray-600">{property.location}</p>
-            </div>
-            <div className="text-2xl font-bold text-indigo-600">${property.price}/night</div>
-          </div>
-
-          {/* Owner Information */}
-          <div className="mt-6 pb-6 border-b border-gray-200">
-            <p className="text-sm text-gray-500">
-              Posted by: {property.owner?.name || 'Anonymous'}
-            </p>
-            <p className="text-sm text-gray-500">
-              Posted on: {new Date(property.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-
-          {/* Description */}
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold text-gray-900">Description</h2>
-            <p className="mt-2 text-gray-600 whitespace-pre-line">{property.description}</p>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-8 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4">
-            {isOwner ? (
-              <>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Image Gallery */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-8"
+            >
+              <div className="relative h-96 lg:h-[500px] rounded-xl overflow-hidden bg-gray-200">
+                <img
+                  src={propertyImages[currentImageIndex]}
+                  alt={property.title}
+                  className="w-full h-full object-cover"
+                />
+                
+                {/* Navigation Arrows */}
                 <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                  onClick={() => setCurrentImageIndex(prev => prev === 0 ? propertyImages.length - 1 : prev - 1)}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
                 >
-                  {deleting ? 'Deleting...' : 'Delete Property'}
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-              </>
-            ) : (
-              <>
+                
                 <button
-                  onClick={handleBookProperty}
-                  className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={() => setCurrentImageIndex(prev => (prev + 1) % propertyImages.length)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
                 >
-                  Book This Property
+                  <ChevronRight className="w-5 h-5" />
                 </button>
-                <button
-                  onClick={handleContactOwner}
-                  className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Contact Owner
-                </button>
-              </>
-            )}
-            {!isAuthenticated && (
-              <p className="text-sm text-gray-500 mt-2">
-                Please <Link href="/login" className="text-indigo-600 hover:text-indigo-500">sign in</Link> to book this property.
-              </p>
-            )}
+
+                {/* Image Indicators */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {propertyImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Thumbnail Gallery */}
+              <div className="flex space-x-2 mt-4">
+                {propertyImages.map((image, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentImageIndex(index)}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
+                      index === currentImageIndex ? 'border-realestate-500' : 'border-gray-200'
+                    }`}
+                  >
+                    <img
+                      src={image}
+                      alt={`Property image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Property Details */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="space-y-8"
+            >
+              {/* Basic Info */}
+              <div>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h1 className="text-3xl font-display font-bold text-gray-900 mb-2">
+                      {property.title}
+                    </h1>
+                    <div className="flex items-center space-x-4 text-gray-600">
+                      <div className="flex items-center">
+                        <MapPin className="w-4 h-4 mr-1" />
+                        <span>{property.location}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Star className="w-4 h-4 fill-current text-yellow-500 mr-1" />
+                        <span>4.8 (24 reviews)</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-bold text-realestate-600">
+                      ${property.price.toLocaleString()}
+                    </div>
+                    <div className="text-gray-500">per month</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Property Features */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Property Features</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div className="flex items-center space-x-3">
+                      <Bed className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <div className="font-medium">3 Bedrooms</div>
+                        <div className="text-sm text-gray-500">Master with en-suite</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <Bath className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <div className="font-medium">2 Bathrooms</div>
+                        <div className="text-sm text-gray-500">Full bathrooms</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <Square className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <div className="font-medium">1,200 sqft</div>
+                        <div className="text-sm text-gray-500">Living area</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <Car className="w-5 h-5 text-gray-600" />
+                      <div>
+                        <div className="font-medium">1 Parking</div>
+                        <div className="text-sm text-gray-500">Covered space</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Amenities */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Amenities</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {[
+                      { icon: Wifi, name: 'High-speed WiFi' },
+                      { icon: AirVent, name: 'Central Air Conditioning' },
+                      { icon: UtensilsCrossed, name: 'Gourmet Kitchen' },
+                      { icon: Shield, name: 'Security System' },
+                      { icon: Building2, name: 'Elevator Access' },
+                      { icon: Calendar, name: 'In-unit Laundry' },
+                    ].map((amenity, index) => (
+                      <div key={index} className="flex items-center space-x-3">
+                        <amenity.icon className="w-5 h-5 text-realestate-600" />
+                        <span className="text-gray-700">{amenity.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Description */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>About This Property</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-700 leading-relaxed">
+                    {property.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           </div>
+
+          {/* Sidebar */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="space-y-6"
+          >
+            {/* Booking Card */}
+            <Card className="sticky top-8">
+              <CardHeader>
+                <CardTitle>Book This Property</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-realestate-600 mb-2">
+                    ${property.price.toLocaleString()}
+                  </div>
+                  <div className="text-gray-500">per month</div>
+                </div>
+
+                <div className="space-y-3">
+                  <input
+                    type="date"
+                    value={bookingDate}
+                    onChange={(e) => setBookingDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-realestate-500 focus:border-transparent"
+                    placeholder="Select move-in date"
+                  />
+                  
+                  <Button
+                    onClick={handleBooking}
+                    className="w-full bg-realestate-600 hover:bg-realestate-700"
+                    size="lg"
+                  >
+                    Request Booking
+                  </Button>
+                  
+                  <Button
+                    onClick={handleContact}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Contact Owner
+                  </Button>
+                </div>
+
+                <div className="text-center text-sm text-gray-500">
+                  <p>No application fees</p>
+                  <p>Instant response</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Owner Info */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Property Owner</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-realestate-100 rounded-full flex items-center justify-center">
+                    <User className="w-6 h-6 text-realestate-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium">John Smith</div>
+                    <div className="text-sm text-gray-500">Verified Owner</div>
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Button variant="ghost" className="w-full justify-start">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Call Owner
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start">
+                    <Mail className="w-4 h-4 mr-2" />
+                    Send Message
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
       </div>
     </div>

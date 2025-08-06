@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useSocket } from '../../contexts/SocketContext';
 import { messageAPI } from '../../services/api';
 import { DirectMessage } from '../../types';
