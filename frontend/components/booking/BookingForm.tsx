@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { initializeRazorpay } from '../../services/razorpay';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import api from '../../services/api';
 
 interface BookingFormProps {
