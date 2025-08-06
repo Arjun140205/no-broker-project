@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSocket } from './SocketContext';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from './AuthContext';
 import api from '../services/api';
 
 interface Chat {
