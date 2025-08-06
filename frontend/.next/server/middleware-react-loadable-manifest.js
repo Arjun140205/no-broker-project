@@ -1,1 +1,0 @@
-self.__REACT_LOADABLE_MANIFEST="{\"pages/_app.tsx -> ../contexts/SocketContext\":{\"id\":\"pages/_app.tsx -> ../contexts/SocketContext\",\"files\":[\"static/chunks/contexts_SocketContext_tsx.js\"]}}"
