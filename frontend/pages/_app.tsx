@@ -1,41 +1,51 @@
-import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import { Toaster } from 'react-hot-toast';
-import Layout from '../components/Layout';
-import { useRouter } from 'next/router';
+import { AuthProvider } from '../contexts/AuthContext';
 import { SocketProvider } from '../contexts/SocketContext';
-import dynamic from 'next/dynamic';
-
-// Use dynamic import with no SSR for SocketProvider to avoid hydration issues
-const SocketProviderWithNoSSR = dynamic(
-  () => import('../contexts/SocketContext').then((mod) => mod.SocketProvider),
-  { ssr: false }
-);
-
-const ChatProviderWithNoSSR = dynamic(
-  () => import('../contexts/ChatContext').then((mod) => mod.ChatProvider),
-  { ssr: false }
-);
+import Layout from '../components/Layout';
+import { Toaster } from 'react-hot-toast';
+import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter();
-  
-  // Check if the current route is login or register - don't wrap those with the full layout
-  const isAuthPage = router.pathname === '/login' || router.pathname === '/register';
-  
+  // Pages that don't need the layout
+  const noLayoutPages = ['/login', '/register'];
+  const shouldUseLayout = !noLayoutPages.includes(pageProps.router?.pathname || '');
+
   return (
-    <SocketProviderWithNoSSR>
-      <ChatProviderWithNoSSR>
-        {isAuthPage ? (
-          <Component {...pageProps} />
-        ) : (
+    <AuthProvider>
+      <SocketProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              iconTheme: {
+                primary: '#10b981',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              duration: 5000,
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
+        {shouldUseLayout ? (
           <Layout>
             <Component {...pageProps} />
           </Layout>
+        ) : (
+          <Component {...pageProps} />
         )}
-        <Toaster position="top-right" />
-      </ChatProviderWithNoSSR>
-    </SocketProviderWithNoSSR>
+      </SocketProvider>
+    </AuthProvider>
   );
 }
 
