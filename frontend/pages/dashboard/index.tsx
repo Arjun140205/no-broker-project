@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../../hooks/useAuth';
 import Link from 'next/link';
@@ -6,12 +6,22 @@ import Link from 'next/link';
 const Dashboard = () => {
   const { user, loading, isAuthenticated } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && !loading && !isAuthenticated) {
       router.push('/login');
     }
-  }, [loading, isAuthenticated, router]);
+  }, [loading, isAuthenticated, router, mounted]);
+
+  // Don't render anything until after mounting to prevent hydration issues
+  if (!mounted) {
+    return null;
+  }
 
   if (loading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
