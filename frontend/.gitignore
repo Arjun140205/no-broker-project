@@ -8,3 +8,4 @@ dist/
 *.local
 .vscode/
 package-lock.json
+.next/
