@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { bookingAPI } from '../../services/api';
 import { Booking } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/router';
 
 const BookingRequests = () => {
