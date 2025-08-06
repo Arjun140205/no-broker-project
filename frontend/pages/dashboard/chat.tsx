@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { chatAPI } from '../../services/api';
 import { Chat as ChatType, Message, MessageFormData } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useRouter } from 'next/router';
 
 const Chat = () => {
