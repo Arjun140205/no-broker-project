@@ -12,6 +12,11 @@ const SocketProviderWithNoSSR = dynamic(
   { ssr: false }
 );
 
+const ChatProviderWithNoSSR = dynamic(
+  () => import('../contexts/ChatContext').then((mod) => mod.ChatProvider),
+  { ssr: false }
+);
+
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
   
@@ -20,14 +25,16 @@ function MyApp({ Component, pageProps }: AppProps) {
   
   return (
     <SocketProviderWithNoSSR>
-      {isAuthPage ? (
-        <Component {...pageProps} />
-      ) : (
-        <Layout>
+      <ChatProviderWithNoSSR>
+        {isAuthPage ? (
           <Component {...pageProps} />
-        </Layout>
-      )}
-      <Toaster position="top-right" />
+        ) : (
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        )}
+        <Toaster position="top-right" />
+      </ChatProviderWithNoSSR>
     </SocketProviderWithNoSSR>
   );
 }
