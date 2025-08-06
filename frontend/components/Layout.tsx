@@ -30,13 +30,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex items-center">
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
-                  <Link href="/dashboard" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
-                    Dashboard
-                  </Link>
+                  {user?.role === 'dealer' ? (
+                    <>
+                      <Link href="/dashboard/properties" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        My Properties
+                      </Link>
+                      <Link href="/dashboard/bookings" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        Booking Requests
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/dashboard/my-bookings" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        My Bookings
+                      </Link>
+                      <Link href="/browse" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+                        Find Properties
+                      </Link>
+                    </>
+                  )}
                   <Link href="/chat" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
                     Messages
                   </Link>
-                  <span className="text-sm text-gray-700">Hi, {user?.name}</span>
+                  <span className="text-sm text-gray-700">Hi, {user?.name} ({user?.role})</span>
                   <button
                     onClick={logout}
                     className="text-gray-700 hover:text-red-600 px-3 py-2 text-sm font-medium"
