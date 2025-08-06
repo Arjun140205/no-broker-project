@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { propertyAPI } from '../../services/api';
 import { Property } from '../../types';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
