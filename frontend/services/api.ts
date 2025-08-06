@@ -15,8 +15,8 @@ import {
 // Create axios instance with base URL
 const api: AxiosInstance = axios.create({
   baseURL: typeof window !== 'undefined' ? 
-    (window as any)?.process?.env?.NEXT_PUBLIC_API_URL || 'http://localhost:4000' : 
-    'http://localhost:4000',
+    (window as any)?.process?.env?.NEXT_PUBLIC_API_URL || 'http://localhost:4001' : 
+    'http://localhost:4001',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -42,18 +42,14 @@ api.interceptors.request.use(
 // Auth API Services
 export const authAPI = {
   // Register a new user
-  registerUser: async (data: RegisterData): Promise<User> => {
-    const response = await api.post<User>('/api/auth/register', data);
+  register: async (data: RegisterData & { role: string }): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/api/auth/register', data);
     return response.data;
   },
 
   // Login user
-  loginUser: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+  login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/api/auth/login', credentials);
-    // Store token in localStorage
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
     return response.data;
   },
 
@@ -63,9 +59,29 @@ export const authAPI = {
     return response.data;
   },
 
-  // Logout user (client-side only)
-  logout: (): void => {
-    localStorage.removeItem('token');
+  // Logout user
+  logout: async (): Promise<void> => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  },
+
+  // Legacy method for backward compatibility
+  registerUser: async (data: RegisterData): Promise<User> => {
+    const response = await api.post<User>('/api/auth/register', data);
+    return response.data;
+  },
+
+  // Legacy method for backward compatibility
+  loginUser: async (credentials: LoginCredentials): Promise<AuthResponse> => {
+    const response = await api.post<AuthResponse>('/api/auth/login', credentials);
+    // Store token in localStorage
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+    }
+    return response.data;
   }
 };
 
