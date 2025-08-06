@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  properties   Property[]
+  messages     Message[]
+  chatsAsBuyer Chat[]   @relation("BuyerChats")
+  chatsAsOwner Chat[]   @relation("OwnerChats")
+  bookingsMade Booking[] @relation("UserBookings")
+  bookingsReceived Booking[] @relation("OwnerBookings")
+  sentMessages DirectMessage[] @relation("SentMessages")
+  receivedMessages DirectMessage[] @relation("ReceivedMessages")
+  createdAt    DateTime @default(now())
+}
+
+model Property {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  price       Float
+  location    String
+  type        PropertyType
+  owner       User     @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  messages    Message[]
+  chats       Chat[]
+  bookings    Booking[]
+  createdAt   DateTime @default(now())
+}
+
+model Chat {
+  id         String   @id @default(uuid())
+  buyer      User     @relation("BuyerChats", fields: [buyerId], references: [id])
+  buyerId    String
+  owner      User     @relation("OwnerChats", fields: [ownerId], references: [id])
+  ownerId    String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+  messages   Message[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([buyerId, ownerId, propertyId])
+}
+
+model Message {
+  id         String   @id @default(uuid())
+  content    String
+  sender     User     @relation(fields: [senderId], references: [id])
+  senderId   String
+  chat       Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  chatId     String
+  property   Property @relation(fields: [propertyId], references: [id])
+  propertyId String
+  timestamp  DateTime @default(now())
+}
+
+model Booking {
+  id         String        @id @default(uuid())
+  property   Property      @relation(fields: [propertyId], references: [id])
+  propertyId String
+  user       User          @relation("UserBookings", fields: [userId], references: [id])
+  userId     String
+  owner      User          @relation("OwnerBookings", fields: [ownerId], references: [id])
+  ownerId    String
+  status     BookingStatus @default(pending)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+enum Role {
+  owner
+  seeker
+}
+
+enum PropertyType {
+  flat
+  house
+  pg
+}
+
+enum BookingStatus {
+  pending
+  accepted
+  rejected
+}
+
+model DirectMessage {
+  id         String   @id @default(uuid())
+  content    String
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  
+  @@index([senderId, receiverId])
+}
