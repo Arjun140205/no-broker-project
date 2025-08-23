@@ -14,9 +14,9 @@ import {
 
 // Create axios instance with base URL
 const api: AxiosInstance = axios.create({
-  baseURL: typeof window !== 'undefined' ? 
-    (window as any)?.process?.env?.NEXT_PUBLIC_API_URL || 'http://localhost:4001' : 
-    'http://localhost:4001',
+  baseURL: typeof window !== 'undefined'
+    ? (window as any)?.process?.env?.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+    : 'http://localhost:4000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -161,8 +161,8 @@ export const chatAPI = {
 
   // Get all chats for current user
   getAllChats: async (): Promise<Chat[]> => {
-    const response = await api.get<Chat[]>('/api/chat');
-    return response.data;
+    const response = await api.get<{ chats: Chat[] }>('/api/chat');
+    return response.data.chats || [];
   },
 
   // Send a message in a chat
@@ -187,8 +187,8 @@ export const bookingAPI = {
   },
 
   // Get bookings made by the current user
-  getMyBookings: async (): Promise<Booking[]> => {
-    const response = await api.get<Booking[]>('/api/book');
+  getMyBookings: async (): Promise<{ bookings: Booking[] }> => {
+    const response = await api.get<{ bookings: Booking[] }>('/api/book');
     return response.data;
   },
 
