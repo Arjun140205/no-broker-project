@@ -251,16 +251,19 @@ export const getUserChats = async (req: AuthenticatedRequest, res: Response) => 
 
     const totalPages = Math.ceil(totalCount / limitNum);
 
-    // Transform chats to include latest message snippet and other user info
-    const transformedChats = chats.map(chat => ({
-      id: chat.id,
-      property: chat.property,
-      otherUser: chat.buyerId === req.userId ? chat.owner : chat.buyer,
-      userRole: chat.buyerId === req.userId ? 'buyer' : 'owner',
-      latestMessage: chat.messages[0] || null,
-      createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt,
-    }));
+
+    // Defensive: filter out chats with missing relations to avoid 500 errors
+    const transformedChats = chats
+      .filter(chat => chat && chat.property && chat.buyer && chat.owner)
+      .map(chat => ({
+        id: chat.id,
+        property: chat.property,
+        otherUser: chat.buyerId === req.userId ? chat.owner : chat.buyer,
+        userRole: chat.buyerId === req.userId ? 'buyer' : 'owner',
+        latestMessage: chat.messages[0] || null,
+        createdAt: chat.createdAt,
+        updatedAt: chat.updatedAt,
+      }));
 
     res.json({
       chats: transformedChats,
@@ -273,8 +276,13 @@ export const getUserChats = async (req: AuthenticatedRequest, res: Response) => 
       },
     });
   } catch (error) {
+    // Enhanced error logging for debugging
     console.error('[GET USER CHATS ERROR]', error);
-    res.status(500).json({ message: 'Failed to fetch chats', error: 'Internal server error' });
+    if (error instanceof Error) {
+      res.status(500).json({ message: 'Failed to fetch chats', error: error.message, stack: error.stack });
+    } else {
+      res.status(500).json({ message: 'Failed to fetch chats', error });
+    }
   }
 };
 
