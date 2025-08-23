@@ -26,7 +26,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const connect = () => {
     if (!isAuthenticated || socket) return;
 
-    const newSocket = io('http://localhost:4001', {
+  const newSocket = io('http://localhost:4000', {
       auth: {
         token: localStorage.getItem('token')
       }
