@@ -9,7 +9,7 @@ import chatRoutes from './routes/chatRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import messageRoutes from './routes/messageRoutes';
 import config from './config/environment';
-import { shouldUseMockResponses, createMockDebugInfo } from './utils/mockResponseUtil';
+// import { shouldUseMockResponses, createMockDebugInfo } from './utils/mockResponseUtil';
 
 // Environment variables are loaded in config/environment.ts
 
@@ -30,13 +30,7 @@ const prisma = new PrismaClient();
 // Set port from environment config
 const PORT = config.PORT || 4000;
 
-// Detect if we should use mock data
-const useMockData = shouldUseMockResponses();
-if (useMockData) {
-  console.log('🧪 Running in MOCK DATA MODE - database operations will be simulated');
-} else {
-  console.log('🔌 Running with LIVE DATABASE connections');
-}
+console.log('🔌 Running with LIVE DATABASE connections');
 
 // Store online users: { userId: socketId }
 const onlineUsers = new Map<string, string>();
@@ -80,31 +74,18 @@ app.get('/test-db', async (req: Request, res: Response) => {
       message: 'Database connection successful',
       propertyCount: count,
       databaseUrl: config.DATABASE_URL ? 'Configured' : 'Missing',
-      mockDataMode: useMockData ? 'Enabled' : 'Disabled',
+  // mockDataMode: useMockData ? 'Enabled' : 'Disabled',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
     console.error('Database test error:', error);
     
-    if (shouldUseMockResponses()) {
-      // If we're in mock mode, return a success response with mock data
-      return res.status(200).json({
-        message: 'Using mock data mode - database connection not required',
-        propertyCount: 3, // Mock property count
-        databaseUrl: config.DATABASE_URL ? 'Configured but not connected' : 'Missing',
-        mockDataMode: 'Enabled',
-        timestamp: new Date().toISOString(),
-        _debug: createMockDebugInfo('Database connection test is using mock data')
-      });
-    } else {
-      return res.status(500).json({
-        message: 'Database connection failed',
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : 'No stack trace',
-        mockDataMode: 'Disabled',
-        timestamp: new Date().toISOString()
-      });
-    }
+    return res.status(500).json({
+      message: 'Database connection failed',
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'No stack trace',
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
@@ -203,34 +184,15 @@ io.on('connection', (socket: Socket) => {
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Unhandled error:', err);
   
-  if (shouldUseMockResponses()) {
-    // If we're in mock mode, respond with a friendly error and indicate mock data mode
-    res.status(500).json({
-      message: 'An error occurred but mock data mode is enabled',
-      mockDataMode: 'Enabled',
-      originalPath: req.path,
-      originalMethod: req.method,
-      _debug: createMockDebugInfo('Error occurred but mock data mode is enabled')
-    });
-  } else {
-    // In production, send a proper error response
-    res.status(500).json({
-      message: 'An unexpected error occurred',
-      error: err instanceof Error ? err.message : String(err),
-      mockDataMode: 'Disabled'
-    });
-  }
+  // In production, send a proper error response
+  res.status(500).json({
+    message: 'An unexpected error occurred',
+    error: err instanceof Error ? err.message : String(err)
+  });
 });
 
 // Add diagnostic endpoint to check mock data status
-app.get('/api/status', (req: Request, res: Response) => {
-  res.json({
-    status: 'online',
-    mockDataMode: shouldUseMockResponses() ? 'Enabled' : 'Disabled',
-    environment: config.NODE_ENV,
-    timestamp: new Date().toISOString()
-  });
-});
+
 
 // Export for testing purposes
 export { app, onlineUsers };
@@ -260,9 +222,7 @@ const startServer = (attemptPort: number, maxAttempts = 3, attempt = 1) => {
     console.log(`🚀 Server ready on http://localhost:${attemptPort}`);
     console.log(`🔌 Socket.IO server initialized`);
     console.log(`🛠️ Environment: ${config.NODE_ENV}`);
-    if (shouldUseMockResponses()) {
-      console.log(`⚠️ Mock data mode ENABLED - database operations will return mock responses`);
-    }
+  // Mock data mode removed; always using real database
   });
 };
 
