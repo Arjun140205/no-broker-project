@@ -23,8 +23,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
+
 const Dashboard = () => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState({
     properties: 0,
@@ -34,19 +35,27 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.push('/login');
       return;
     }
+    if (!authLoading && isAuthenticated) {
+      // Simulate loading stats
+      setStats({
+        properties: user?.role === 'owner' ? 3 : 0,
+        bookings: user?.role === 'seeker' ? 2 : 5,
+        messages: 8,
+        favorites: 4
+      });
+    }
+  }, [authLoading, isAuthenticated, user, router]);
 
-    // Simulate loading stats
-    setStats({
-      properties: user?.role === 'owner' ? 3 : 0,
-      bookings: user?.role === 'seeker' ? 2 : 5,
-      messages: 8,
-      favorites: 4
-    });
-  }, [isAuthenticated, user, router]);
+  if (authLoading) {
+    return <div className="flex justify-center items-center h-screen">Loading...</div>;
+  }
+  if (!isAuthenticated) {
+    return null; // Will redirect
+  }
 
   const recentActivities = [
     {
