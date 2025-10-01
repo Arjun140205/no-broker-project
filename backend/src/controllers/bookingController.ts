@@ -21,43 +21,107 @@ export const createBookingRequest = async (req: AuthenticatedRequest, res: Respo
     }
 
     const { propertyId } = req.params;
+    const { checkIn, checkOut } = req.body;
 
     if (!propertyId) {
       return res.status(400).json({ message: 'Property ID is required' });
     }
-    
-    console.log(`POST /book/${propertyId} - Mock booking creation`);
-    
-    // Return a mock booking response
-    return res.status(201).json({
-      id: `mock-booking-${Date.now()}`,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-      userId: req.userId,
-      propertyId: propertyId,
-      property: {
-        id: propertyId,
-        title: `Mock Property ${propertyId}`,
-        description: "This is a mock property description",
-        price: 1200,
-        location: "123 Mock Street, Test City",
-        type: "flat"
-      },
-      user: {
-        id: req.userId,
-        name: req.user?.name || "Mock User",
-        email: req.user?.email || "mock@example.com"
-      },
-      owner: {
-        id: `mock-owner-${Date.now()}`,
-        name: "Property Owner",
-        email: "owner@example.com"
-      },
-      _debug: {
-        mock: true,
-        timestamp: new Date().toISOString(),
-        message: "This is a mock booking creation response for development purposes"
+
+    if (!checkIn || !checkOut) {
+      return res.status(400).json({ message: 'Check-in and check-out dates are required' });
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+
+    if (checkInDate >= checkOutDate) {
+      return res.status(400).json({ message: 'Check-out date must be after check-in date' });
+    }
+
+    if (checkInDate < new Date()) {
+      return res.status(400).json({ message: 'Check-in date cannot be in the past' });
+    }
+
+    // Check if property exists
+    const property = await prisma.property.findUnique({
+      where: { id: propertyId },
+      include: { owner: true }
+    });
+
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+
+    // Prevent self-booking
+    if (property.ownerId === req.userId) {
+      return res.status(400).json({ message: 'Cannot book your own property' });
+    }
+
+    // Check for overlapping bookings
+    const overlappingBooking = await prisma.booking.findFirst({
+      where: {
+        propertyId,
+        status: { in: ['pending', 'accepted'] },
+        OR: [
+          {
+            checkIn: { lte: checkOutDate },
+            checkOut: { gte: checkInDate }
+          }
+        ]
       }
+    });
+
+    if (overlappingBooking) {
+      return res.status(400).json({ message: 'Property is not available for the selected dates' });
+    }
+
+    // Calculate total amount (number of days * daily price)
+    const days = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+    const totalAmount = days * property.price;
+
+    // Create booking
+    const booking = await prisma.booking.create({
+      data: {
+        propertyId,
+        userId: req.userId,
+        ownerId: property.ownerId,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        totalAmount,
+        status: 'pending'
+      },
+      include: {
+        property: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            location: true,
+            images: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        },
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        }
+      }
+    });
+
+    res.status(201).json({
+      message: 'Booking request created successfully',
+      booking
     });
   } catch (error) {
     console.error('[CREATE BOOKING ERROR]', error);
