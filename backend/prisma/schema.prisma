@@ -13,6 +13,10 @@ model User {
   email        String   @unique
   passwordHash String
   role         Role
+  phone        String?
+  avatar       String?
+  bio          String?
+  verified     Boolean  @default(false)
   properties   Property[]
   messages     Message[]
   chatsAsBuyer Chat[]   @relation("BuyerChats")
@@ -22,6 +26,7 @@ model User {
   sentMessages DirectMessage[] @relation("SentMessages")
   receivedMessages DirectMessage[] @relation("ReceivedMessages")
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model Property {
@@ -30,13 +35,26 @@ model Property {
   description String
   price       Float
   location    String
+  address     String?
+  city        String
+  state       String
+  pincode     String?
   type        PropertyType
+  category    PropertyCategory @default(rent)
+  bedrooms    Int?
+  bathrooms   Int?
+  area        Float?
+  furnished   FurnishedType @default(unfurnished)
+  amenities   String[]
+  images      String[]
+  available   Boolean  @default(true)
   owner       User     @relation(fields: [ownerId], references: [id])
   ownerId     String
   messages    Message[]
   chats       Chat[]
   bookings    Booking[]
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Chat {
@@ -74,7 +92,12 @@ model Booking {
   userId     String
   owner      User          @relation("OwnerBookings", fields: [ownerId], references: [id])
   ownerId    String
+  checkIn    DateTime
+  checkOut   DateTime
+  totalAmount Float
   status     BookingStatus @default(pending)
+  paymentId  String?
+  paymentStatus PaymentStatus @default(pending)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 }
@@ -88,12 +111,34 @@ enum PropertyType {
   flat
   house
   pg
+  villa
+  studio
+  office
+}
+
+enum PropertyCategory {
+  rent
+  buy
+}
+
+enum FurnishedType {
+  furnished
+  semifurnished
+  unfurnished
 }
 
 enum BookingStatus {
   pending
   accepted
   rejected
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
 }
 
 model DirectMessage {
@@ -107,4 +152,17 @@ model DirectMessage {
   createdAt  DateTime @default(now())
   
   @@index([senderId, receiverId])
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  bookingId     String        @unique
+  razorpayOrderId String?
+  razorpayPaymentId String?
+  razorpaySignature String?
+  amount        Float
+  currency      String        @default("INR")
+  status        PaymentStatus @default(pending)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
