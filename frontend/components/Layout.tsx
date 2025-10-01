@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
 import { 
@@ -18,7 +19,11 @@ import {
   MessageCircle,
   Calendar,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  Sun,
+  Moon,
+  Crown,
+  Zap
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -27,6 +32,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout, isAuthenticated } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -86,8 +92,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <Link href="/" className="flex items-center space-x-2">
                 <div className="relative">
-                  <Home className="w-8 h-8 text-realestate-600" />
-                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-luxury-500" />
+                  <Crown className="w-8 h-8 text-primary" />
+                  <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-gold-500" />
                 </div>
                 <span className="text-2xl font-display font-bold gradient-text">
                   Estospaces
@@ -120,20 +126,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Desktop User Menu */}
             <div className="hidden md:flex items-center space-x-4">
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className="relative overflow-hidden group"
+              >
+                <motion.div
+                  initial={false}
+                  animate={{ rotate: theme === 'dark' ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {theme === 'light' ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
+                </motion.div>
+              </Button>
+
               {isAuthenticated ? (
                 <div className="relative">
                   <Button
                     variant="ghost"
                     onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                    className="flex items-center space-x-2"
+                    className="flex items-center space-x-2 glass-effect border-0"
                   >
-                    <div className="w-8 h-8 bg-realestate-100 rounded-full flex items-center justify-center">
-                      <User className="w-4 h-4 text-realestate-600" />
+                    <div className="w-8 h-8 premium-gradient rounded-full flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium">
                       {user?.name || 'User'}
                     </span>
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    <ChevronDown className="w-4 h-4 opacity-60" />
                   </Button>
 
                   <AnimatePresence>
@@ -143,7 +169,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-large border border-gray-200 py-2"
+                        className="absolute right-0 mt-2 w-56 glass-effect rounded-lg luxury-shadow py-2"
                       >
                         {userMenuItems.map((item) => {
                           const Icon = item.icon;
@@ -153,10 +179,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             <Link
                               key={item.name}
                               href={item.href}
-                              className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors ${
+                              className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors rounded-md mx-2 ${
                                 isActive 
-                                  ? 'text-realestate-600 bg-realestate-50' 
-                                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                                  ? 'text-primary bg-primary/10' 
+                                  : 'hover:bg-primary/5'
                               }`}
                               onClick={() => setIsUserMenuOpen(false)}
                             >
@@ -166,11 +192,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           );
                         })}
                         
-                        <div className="border-t border-gray-200 my-2"></div>
+                        <div className="border-t border-border my-2 mx-2"></div>
                         
                         <button
                           onClick={handleLogout}
-                          className="flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 w-full transition-colors"
+                          className="flex items-center space-x-3 px-4 py-2 text-sm text-red-500 hover:text-red-600 hover:bg-red-500/10 w-full transition-colors rounded-md mx-2"
                         >
                           <LogOut className="w-4 h-4" />
                           <span>Sign Out</span>
@@ -181,11 +207,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <Button variant="ghost" asChild>
+                  <Button variant="ghost" asChild className="glass-effect border-0">
                     <Link href="/login">Sign In</Link>
                   </Button>
-                  <Button className="bg-realestate-600 hover:bg-realestate-700" asChild>
-                    <Link href="/register">Get Started</Link>
+                  <Button className="btn-premium" asChild>
+                    <Link href="/register">
+                      <Zap className="w-4 h-4 mr-2" />
+                      Get Started
+                    </Link>
                   </Button>
                 </div>
               )}
@@ -216,7 +245,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="md:hidden bg-white border-t border-gray-200"
+              className="md:hidden glass-effect border-t border-border"
             >
               <div className="px-4 py-6 space-y-4">
                 {navigation.map((item) => {
@@ -306,51 +335,52 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <footer className="relative overflow-hidden bg-gradient-to-br from-background via-muted/20 to-background border-t border-border">
+        <div className="absolute inset-0 bg-hero-pattern opacity-5"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-2 mb-4">
-                <Home className="w-8 h-8 text-realestate-400" />
-                <span className="text-2xl font-display font-bold">Estospaces</span>
+              <div className="flex items-center space-x-2 mb-6">
+                <Crown className="w-8 h-8 text-primary" />
+                <span className="text-2xl font-display font-bold gradient-text">Estospaces</span>
               </div>
-              <p className="text-gray-400 mb-6 max-w-md">
-                Your gateway to premium real estate. Find the perfect property that matches your lifestyle and dreams.
+              <p className="text-muted-foreground mb-6 max-w-md leading-relaxed">
+                Your gateway to premium real estate. Experience luxury living with our curated collection of exceptional properties.
               </p>
               <div className="flex space-x-4">
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                <Button variant="ghost" size="sm" className="glass-effect border-0 hover:scale-105 transition-transform">
                   <Bell className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                <Button variant="ghost" size="sm" className="glass-effect border-0 hover:scale-105 transition-transform">
                   <MessageCircle className="w-4 h-4" />
                 </Button>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li><Link href="/browse" className="text-gray-400 hover:text-white transition-colors">Browse Properties</Link></li>
-                <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-                <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-                <li><Link href="/help" className="text-gray-400 hover:text-white transition-colors">Help Center</Link></li>
+              <h3 className="text-lg font-semibold mb-6 font-display">Quick Links</h3>
+              <ul className="space-y-3">
+                <li><Link href="/browse" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Browse Properties</Link></li>
+                <li><Link href="/about" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">About Us</Link></li>
+                <li><Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Contact</Link></li>
+                <li><Link href="/help" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Help Center</Link></li>
               </ul>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2">
-                <li><Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
-                <li><Link href="/cookies" className="text-gray-400 hover:text-white transition-colors">Cookie Policy</Link></li>
-                <li><Link href="/security" className="text-gray-400 hover:text-white transition-colors">Security</Link></li>
+              <h3 className="text-lg font-semibold mb-6 font-display">Legal</h3>
+              <ul className="space-y-3">
+                <li><Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Terms of Service</Link></li>
+                <li><Link href="/cookies" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Cookie Policy</Link></li>
+                <li><Link href="/security" className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block">Security</Link></li>
               </ul>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-            <p className="text-gray-400">
-              © 2024 Estospaces. All rights reserved.
+          <div className="border-t border-border mt-12 pt-8 text-center">
+            <p className="text-muted-foreground">
+              © 2024 Estospaces. Crafted with ❤️ for premium living.
             </p>
           </div>
         </div>
