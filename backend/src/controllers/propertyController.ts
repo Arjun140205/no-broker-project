@@ -20,24 +20,61 @@ export const createProperty = async (req: AuthenticatedRequest, res: Response) =
       return res.status(401).json({ message: 'Authentication required' });
     }
 
-    const { title, description, price, location, type } = req.body;
+    const { 
+      title, 
+      description, 
+      price, 
+      location, 
+      city, 
+      state, 
+      type, 
+      category = 'rent',
+      bedrooms,
+      bathrooms,
+      area,
+      furnished = 'unfurnished',
+      amenities = [],
+      images = [],
+      address,
+      pincode
+    } = req.body;
 
     // Validate required fields
-    if (!title || !description || !price || !location || !type) {
+    if (!title || !description || !price || !location || !city || !state || !type) {
       return res.status(400).json({ 
         message: 'Missing required fields', 
-        required: ['title', 'description', 'price', 'location', 'type'],
+        required: ['title', 'description', 'price', 'location', 'city', 'state', 'type'],
         received: Object.keys(req.body || {})
       });
     }
 
     // Validate property type
-    const validTypes = ['flat', 'house', 'pg'];
+    const validTypes = ['flat', 'house', 'pg', 'villa', 'studio', 'office'];
     if (!validTypes.includes(type)) {
       return res.status(400).json({ 
         message: 'Invalid property type', 
         validTypes,
         received: type
+      });
+    }
+
+    // Validate category
+    const validCategories = ['rent', 'buy'];
+    if (!validCategories.includes(category)) {
+      return res.status(400).json({ 
+        message: 'Invalid property category', 
+        validCategories,
+        received: category
+      });
+    }
+
+    // Validate furnished type
+    const validFurnished = ['furnished', 'semifurnished', 'unfurnished'];
+    if (!validFurnished.includes(furnished)) {
+      return res.status(400).json({ 
+        message: 'Invalid furnished type', 
+        validFurnished,
+        received: furnished
       });
     }
 
@@ -56,7 +93,18 @@ export const createProperty = async (req: AuthenticatedRequest, res: Response) =
         description: description.trim(),
         price: numericPrice,
         location: location.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        address: address?.trim(),
+        pincode: pincode?.trim(),
         type,
+        category,
+        bedrooms: bedrooms ? parseInt(bedrooms) : null,
+        bathrooms: bathrooms ? parseInt(bathrooms) : null,
+        area: area ? parseFloat(area) : null,
+        furnished,
+        amenities: Array.isArray(amenities) ? amenities : [],
+        images: Array.isArray(images) ? images : [],
         ownerId: req.userId,
       },
       include: {
