@@ -35,12 +35,20 @@ const Dashboard = () => {
   });
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (authLoading) return;
+
+    if (!isAuthenticated) {
       router.push('/login');
       return;
     }
-    if (!authLoading && isAuthenticated) {
-      // Simulate loading stats
+
+    // Redirect based on user role
+    if (user?.role === 'owner') {
+      router.push('/dashboard/owner');
+    } else if (user?.role === 'seeker') {
+      router.push('/dashboard/user');
+    } else {
+      // Fallback for existing dashboard
       setStats({
         properties: user?.role === 'owner' ? 3 : 0,
         bookings: user?.role === 'seeker' ? 2 : 5,
