@@ -30,7 +30,20 @@ export interface Property {
   description: string;
   price: number;
   location: string;
-  imageUrl?: string;
+  address?: string;
+  city: string;
+  state: string;
+  pincode?: string;
+  type: 'flat' | 'house' | 'pg' | 'villa' | 'studio' | 'office';
+  category: 'rent' | 'buy';
+  bedrooms?: number;
+  bathrooms?: number;
+  area?: number;
+  furnished: 'furnished' | 'semifurnished' | 'unfurnished';
+  amenities: string[];
+  images: string[];
+  available: boolean;
+  imageUrl?: string; // For backward compatibility
   ownerId: string;
   owner?: User;
   createdAt: string;
@@ -74,7 +87,14 @@ export interface Booking {
   property?: Property;
   userId: string;
   user?: User;
-  status: 'pending' | 'accepted' | 'rejected';
+  ownerId: string;
+  owner?: User;
+  checkIn: string;
+  checkOut: string;
+  totalAmount: number;
+  status: 'pending' | 'accepted' | 'rejected' | 'cancelled';
+  paymentId?: string;
+  paymentStatus: 'pending' | 'completed' | 'failed' | 'refunded';
   createdAt: string;
   updatedAt: string;
 }
