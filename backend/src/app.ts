@@ -8,6 +8,7 @@ import propertyRoutes from './routes/propertyRoutes';
 import chatRoutes from './routes/chatRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import messageRoutes from './routes/messageRoutes';
+import paymentRoutes from './routes/paymentRoutes';
 import config from './config/environment';
 // import { shouldUseMockResponses, createMockDebugInfo } from './utils/mockResponseUtil';
 
@@ -55,6 +56,7 @@ app.use('/api/properties', propertyRoutes); // Property routes
 app.use('/api/chat', chatRoutes); // Chat routes
 app.use('/api/book', bookingRoutes); // Booking routes
 app.use('/api/messages', messageRoutes); // Direct messages routes
+app.use('/api/payment', paymentRoutes); // Payment routes
 
 // Health check
 app.get('/', (req: Request, res: Response) => {
