@@ -430,13 +430,6 @@ const Home = () => {
                 description: "White-glove service with dedicated luxury property specialists",
                 color: '#8F9D68',
                 bgGradient: 'from-green-500/20 to-green-700/20'
-              },
-              {
-                icon: Globe,
-                title: "Global Reach",
-                description: "Access to exclusive properties in the world's most desirable locations",
-                color: '#D4AF37',
-                bgGradient: 'from-yellow-400/20 to-yellow-600/20'
               }
             ].map((feature, index) => (
               <motion.div
