@@ -632,7 +632,7 @@ const PremiumLayout: React.FC<PremiumLayoutProps> = ({ children }) => {
                 </li>
                 <li className="flex items-center space-x-3 text-gray-300">
                   <Mail className="w-4 h-4 text-gold-400" />
-                  <span className="font-light">concierge@estospaces.com</span>
+                  <span className="font-light">arjunbirsingh1699@gmail.com</span>
                 </li>
                 <li className="flex items-center space-x-3 text-gray-300">
                   <MapPin className="w-4 h-4 text-gold-400" />
