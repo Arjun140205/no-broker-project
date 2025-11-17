@@ -80,22 +80,22 @@ const Home = () => {
   const heroSlides = [
     {
       title: "Discover Extraordinary",
-      subtitle: "Luxury Properties",
-      description: "Experience sophisticated living with our curated collection of the world's most exclusive properties.",
+      subtitle: "Experiences",
+      description: "Experience sophisticated innovation with our curated collection of premium services and solutions.",
       image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop",
       cta: "Explore Collection"
     },
     {
-      title: "Architectural",
-      subtitle: "Masterpieces",
-      description: "From contemporary penthouses to historic estates, each property represents design excellence.",
+      title: "Award-Winning",
+      subtitle: "Platform",
+      description: "From cutting-edge technology to exceptional design, we represent excellence in every detail.",
       image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&h=1080&fit=crop",
-      cta: "View Masterpieces"
+      cta: "View Features"
     },
     {
       title: "Global",
-      subtitle: "Luxury Living",
-      description: "Discover premium properties in prestigious locations worldwide, from Manhattan to Monaco.",
+      subtitle: "Innovation",
+      description: "Discover premium solutions trusted by clients worldwide, from startups to enterprises.",
       image: "https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=1920&h=1080&fit=crop",
       cta: "Explore Worldwide"
     }
@@ -137,7 +137,7 @@ const Home = () => {
             <div className="hidden md:flex items-center space-x-1">
               {[
                 { href: '/', label: 'Home', icon: HomeIcon },
-                { href: '/properties', label: 'Properties', icon: Search },
+                { href: '/services', label: 'Services', icon: Search },
                 { href: '/about', label: 'About', icon: Award },
                 { href: '/contact', label: 'Contact', icon: Gem },
               ].map((item) => (
@@ -169,7 +169,7 @@ const Home = () => {
                 </div>
               ) : (
                 <div className="flex items-center space-x-3">
-                  <Link href="/auth/login">
+                  <Link href="/login">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       className="px-4 py-2 font-premium transition-colors text-yellow-700 hover:text-yellow-800"
@@ -177,7 +177,7 @@ const Home = () => {
                       Login
                     </motion.button>
                   </Link>
-                  <Link href="/auth/register">
+                  <Link href="/register">
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       className="btn-gold px-6 py-2 rounded-xl font-premium"
@@ -318,7 +318,7 @@ const Home = () => {
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-yellow-400" />
                     <input
                       type="text"
-                      placeholder="Search exclusive luxury properties..."
+                      placeholder="Search premium services..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="premium-input pl-12 font-premium"
@@ -349,7 +349,7 @@ const Home = () => {
                   transition={{ duration: 1, delay: 1.2 }}
                   className="flex flex-wrap gap-2 mt-4 justify-center"
                 >
-                  {['Penthouse', 'Waterfront', 'Manhattan', 'Beverly Hills'].map((tag, index) => (
+                  {['Enterprise', 'Startup', 'Innovation', 'Premium'].map((tag, index) => (
                     <motion.button
                       key={tag}
                       whileHover={{ scale: 1.05 }}
@@ -403,7 +403,7 @@ const Home = () => {
             <div className="w-24 h-1 rounded-full mx-auto mb-8 bg-gradient-to-r from-yellow-400 via-purple-500 to-green-600" />
             <p className="text-body-premium max-w-3xl mx-auto" 
                style={{ color: 'var(--tertiary-moss-dark)' }}>
-              Experience the pinnacle of luxury real estate with our award-winning platform, 
+              Experience the pinnacle of innovation with our award-winning platform, 
               designed for discerning clients who demand excellence.
             </p>
           </motion.div>
@@ -412,22 +412,22 @@ const Home = () => {
             {[
               {
                 icon: Crown,
-                title: "Exclusive Properties",
-                description: "Curated collection of the world's most prestigious properties",
+                title: "Exclusive Access",
+                description: "Curated collection of premium services and innovative solutions",
                 color: '#D4AF37',
                 bgGradient: 'from-yellow-400/20 to-yellow-600/20'
               },
               {
                 icon: Shield,
-                title: "Verified Luxury",
-                description: "Every property undergoes rigorous verification and quality assessment",
+                title: "Verified Quality",
+                description: "Every service undergoes rigorous verification and quality assessment",
                 color: '#7B57CE',
                 bgGradient: 'from-purple-500/20 to-purple-700/20'
               },
               {
                 icon: Gem,
-                title: "Premium Service",
-                description: "White-glove service with dedicated luxury property specialists",
+                title: "Premium Support",
+                description: "White-glove service with dedicated specialists available 24/7",
                 color: '#8F9D68',
                 bgGradient: 'from-green-500/20 to-green-700/20'
               }
@@ -459,7 +459,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Properties Section */}
+      {/* Featured Services Section */}
       <section className="section-padding-luxury bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="container-luxury">
           <motion.div
@@ -470,12 +470,12 @@ const Home = () => {
             className="text-center mb-16"
           >
             <h2 className="text-display-2 font-display mb-6 text-gradient-moss">
-              Featured Properties
+              Featured Services
             </h2>
             <div className="divider-moss mb-8" />
             <p className="text-body-premium max-w-3xl mx-auto" 
                style={{ color: 'var(--neutral-dark)' }}>
-              Discover our handpicked selection of extraordinary properties that define luxury living.
+              Discover our handpicked selection of extraordinary services that define premium excellence.
             </p>
           </motion.div>
 
@@ -574,11 +574,11 @@ const Home = () => {
             <div className="divider-luxury mb-8" />
             <p className="text-body-premium mb-12" 
                style={{ color: 'var(--tertiary-moss-dark)' }}>
-              Join thousands of satisfied clients who have found their perfect luxury property with EstoSpaces.
+              Join thousands of satisfied clients who trust EstoSpaces for premium services and innovation.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/properties">
+              <Link href="/services">
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
@@ -586,13 +586,13 @@ const Home = () => {
                 >
                   <span className="flex items-center gap-2">
                     <Crown className="w-5 h-5" />
-                    Explore Properties
+                    Explore Services
                     <ArrowRight className="w-5 h-5" />
                   </span>
                 </motion.button>
               </Link>
               
-              <Link href="/auth/register">
+              <Link href="/register">
                 <motion.button
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}
