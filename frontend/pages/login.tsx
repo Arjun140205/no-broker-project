@@ -5,10 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, Crown, Shield } from 'lucide-react';
-
 const Login = () => {
   const { login, error, loading, user } = useAuth();
   const router = useRouter();
@@ -47,29 +45,29 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{
-      background: 'linear-gradient(135deg, #7B57CE 0%, #D4AF37 50%, #8F9D68 100%)'
-    }}>
-      {/* Premium Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255, 248, 235, 0.3) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.3) 0%, transparent 50%)`
-        }} />
-      </div>
+        background: 'linear-gradient(135deg, #7B57CE 0%, #D4AF37 50%, #8F9D68 100%)'
+      }}>
+        {/* Premium Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255, 248, 235, 0.3) 0%, transparent 50%),
+                             radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.3) 0%, transparent 50%)`
+          }} />
+        </div>
 
-      {/* Floating Elements */}
-      <motion.div
+        {/* Floating Elements */}
+        <motion.div
         className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-20"
         style={{ background: 'linear-gradient(135deg, #FFF8EB, #D4AF37)' }}
         animate={{ y: [0, -30, 0], scale: [1, 1.1, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-20 w-40 h-40 rounded-full blur-3xl opacity-20"
-        style={{ background: 'linear-gradient(135deg, #8F9D68, #7B57CE)' }}
-        animate={{ y: [0, 30, 0], scale: [1, 1.2, 1] }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-40 h-40 rounded-full blur-3xl opacity-20"
+          style={{ background: 'linear-gradient(135deg, #8F9D68, #7B57CE)' }}
+          animate={{ y: [0, 30, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
 
       <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
