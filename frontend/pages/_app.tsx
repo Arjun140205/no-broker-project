@@ -3,14 +3,13 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { SocketProvider } from '../contexts/SocketContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { SmoothScrollProvider } from '../contexts/SmoothScrollContext';
-import Layout from '../components/PremiumLayout';
+import SharedNavigation from '../components/SharedNavigation';
 import { Toaster } from 'react-hot-toast';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // Pages that don't need the layout
-  const noLayoutPages = ['/login', '/register'];
-  const shouldUseLayout = !noLayoutPages.includes(pageProps.router?.pathname || '');
+  // Use shared navigation for all pages
+  const shouldUseLayout = false;
 
   return (
     <ThemeProvider>
@@ -45,13 +44,10 @@ function MyApp({ Component, pageProps }: AppProps) {
                 },
               }}
             />
-            {shouldUseLayout ? (
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
-            ) : (
+            <>
+              <SharedNavigation />
               <Component {...pageProps} />
-            )}
+            </>
           </SocketProvider>
         </AuthProvider>
       </SmoothScrollProvider>
