@@ -7,6 +7,11 @@ export default function Document() {
         <meta charSet="utf-8" />
         <meta name="description" content="EstoSpaces - Award-winning premium platform" />
         <link rel="icon" href="/favicon.ico" />
+        
+        {/* Premium Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
       </Head>
       <body>
         <Main />
