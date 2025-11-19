@@ -1,556 +1,528 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Property } from '../types';
 import Link from 'next/link';
+import { useInView } from 'react-intersection-observer';
 import { 
   Search, 
   MapPin, 
   Star, 
   ArrowRight, 
-  Home as HomeIcon, 
-  Building2, 
-  Users, 
-  Shield,
-  Award,
-  TrendingUp,
-  Eye,
   Heart,
   Bath,
   Bed,
   Square,
-  Wifi,
-  Car,
-  Coffee,
-  Play,
-  CheckCircle,
-  Globe,
-  Zap,
   Crown,
   Sparkles,
   ChevronDown,
-  Phone,
-  Mail,
-  Calendar,
-  Camera,
-  Lock,
-  Gem,
-  Diamond,
-  User
+  Play,
+  TrendingUp,
+  Award,
+  Shield,
+  Globe
 } from 'lucide-react';
 
-// Premium sample properties
+// Featured properties
 const featuredProperties: Property[] = [
   {
     id: '1',
-    title: 'Royal Penthouse Manhattan',
-    description: 'Extraordinary 4-bedroom penthouse with Central Park views, private elevator, and Italian marble finishes.',
-    price: 25000,
-    location: 'Upper East Side, Manhattan',
+    title: 'Skyline Penthouse',
+    description: 'Breathtaking views from this architectural masterpiece',
+    price: 18500,
+    location: 'Manhattan, New York',
     city: 'New York',
     state: 'New York',
     type: 'flat',
     category: 'rent',
     bedrooms: 4,
     bathrooms: 3,
-    area: 3500,
+    area: 3800,
     furnished: 'furnished',
-    amenities: ['Private Elevator', 'Central Park View', 'Wine Cellar', 'Smart Home', 'Concierge', 'Rooftop Terrace'],
+    amenities: ['Rooftop', 'Concierge', 'Gym'],
     images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&h=800&fit=crop'],
     available: true,
     ownerId: 'owner1',
     createdAt: '2024-01-15',
     updatedAt: '2024-01-15'
+  },
+  {
+    id: '2',
+    title: 'Ocean Villa',
+    description: 'Private beachfront estate with infinity pool',
+    price: 22000,
+    location: 'Malibu, California',
+    city: 'Malibu',
+    state: 'California',
+    type: 'house',
+    category: 'rent',
+    bedrooms: 6,
+    bathrooms: 5,
+    area: 5200,
+    furnished: 'furnished',
+    amenities: ['Beach', 'Pool', 'Spa'],
+    images: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&h=800&fit=crop'],
+    available: true,
+    ownerId: 'owner2',
+    createdAt: '2024-01-16',
+    updatedAt: '2024-01-16'
+  },
+  {
+    id: '3',
+    title: 'Mountain Sanctuary',
+    description: 'Secluded retreat with panoramic mountain vistas',
+    price: 12000,
+    location: 'Aspen, Colorado',
+    city: 'Aspen',
+    state: 'Colorado',
+    type: 'house',
+    category: 'rent',
+    bedrooms: 5,
+    bathrooms: 4,
+    area: 4500,
+    furnished: 'furnished',
+    amenities: ['Fireplace', 'Hot Tub', 'Ski Access'],
+    images: ['https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1200&h=800&fit=crop'],
+    available: true,
+    ownerId: 'owner3',
+    createdAt: '2024-01-17',
+    updatedAt: '2024-01-17'
   }
 ];
 
 const Home = () => {
   const { isAuthenticated, user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const { scrollY } = useScroll();
-  const heroRef = useRef(null);
-  const isHeroInView = useInView(heroRef, { once: true });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
   
-  // Parallax transforms
-  const y1 = useTransform(scrollY, [0, 500], [0, -150]);
-  const y2 = useTransform(scrollY, [0, 500], [0, -100]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  // Smooth scroll progress
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
 
-  const heroSlides = [
-    {
-      title: "Discover Extraordinary",
-      subtitle: "Experiences",
-      description: "Experience sophisticated innovation with our curated collection of premium services and solutions.",
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop",
-      cta: "Explore Collection"
-    },
-    {
-      title: "Award-Winning",
-      subtitle: "Platform",
-      description: "From cutting-edge technology to exceptional design, we represent excellence in every detail.",
-      image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&h=1080&fit=crop",
-      cta: "View Features"
-    },
-    {
-      title: "Global",
-      subtitle: "Innovation",
-      description: "Discover premium solutions trusted by clients worldwide, from startups to enterprises.",
-      image: "https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=1920&h=1080&fit=crop",
-      cta: "Explore Worldwide"
-    }
-  ];
-
+  // Initialize Lenis smooth scroll
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    let lenis: any;
+    
+    const initLenis = async () => {
+      const Lenis = (await import('lenis')).default;
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: 'vertical',
+        smoothWheel: true,
+        wheelMultiplier: 1,
+        touchMultiplier: 2,
+      });
+
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+
+      requestAnimationFrame(raf);
+    };
+
+    initLenis();
+
+    return () => {
+      if (lenis) lenis.destroy();
+    };
   }, []);
 
+  // GSAP Animations
+  useEffect(() => {
+    const initGSAP = async () => {
+      const { gsap } = await import('gsap');
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+      
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Hero text reveal
+      gsap.from('.hero-title', {
+        y: 100,
+        opacity: 0,
+        duration: 1.2,
+        ease: 'power4.out',
+        delay: 0.3
+      });
+
+      gsap.from('.hero-subtitle', {
+        y: 50,
+        opacity: 0,
+        duration: 1,
+        ease: 'power4.out',
+        delay: 0.6
+      });
+
+      // Parallax images
+      gsap.utils.toArray('.parallax-image').forEach((image: any) => {
+        gsap.to(image, {
+          yPercent: 30,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: image,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        });
+      });
+
+      // Fade in sections
+      gsap.utils.toArray('.fade-in-section').forEach((section: any) => {
+        gsap.from(section, {
+          y: 100,
+          opacity: 0,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: section,
+            start: 'top 80%',
+            end: 'top 50%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+      });
+    };
+
+    initGSAP();
+  }, []);
+
+  const [heroRef, heroInView] = useInView({ threshold: 0.3, triggerOnce: true });
+  const [featuredRef, featuredInView] = useInView({ threshold: 0.2, triggerOnce: true });
+
   return (
-    <>
-      {/* Premium Navigation */}
-      <nav className="nav-luxury">
-        <div className="container-luxury">
-          <div className="flex items-center justify-between h-20">
-            {/* Premium Logo */}
-            <Link href="/" className="flex items-center space-x-3 group">
-              <motion.div
-                whileHover={{ rotate: 360, scale: 1.1 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="w-12 h-12 rounded-2xl flex items-center justify-center luxury-shadow micro-glow bg-gradient-to-br from-yellow-400 to-yellow-600"
-              >
-                <Crown className="w-6 h-6 text-white" />
-              </motion.div>
-              <div>
-                <h1 className="text-2xl font-golden font-bold text-gradient-gold">
-                  EstoSpaces
-                </h1>
-                <p className="text-xs font-premium text-yellow-600">
-                  Award-Winning Luxury
-                </p>
-              </div>
-            </Link>
+    <div ref={containerRef} className="relative bg-[#0A0A0A] text-white overflow-hidden">
+      {/* Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 origin-left z-50"
+        style={{ scaleX }}
+      />
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-1">
-              {[
-                { href: '/', label: 'Home', icon: HomeIcon },
-                { href: '/services', label: 'Services', icon: Search },
-                { href: '/about', label: 'About', icon: Award },
-                { href: '/contact', label: 'Contact', icon: Gem },
-              ].map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <motion.div
-                    whileHover={{ y: -2 }}
-                    className="nav-link-luxury flex items-center space-x-2"
-                  >
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.label}</span>
-                  </motion.div>
-                </Link>
-              ))}
-            </div>
-
-            {/* Right Side Actions */}
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-3">
-                  <Link href="/dashboard">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      className="flex items-center space-x-2 px-4 py-2 rounded-xl font-premium luxury-shadow micro-glow bg-gradient-to-r from-yellow-400 to-yellow-600 text-white"
-                    >
-                      <User className="w-4 h-4" />
-                      <span className="hidden sm:inline">{user?.name || 'Dashboard'}</span>
-                    </motion.div>
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-3">
-                  <Link href="/login">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      className="px-4 py-2 font-premium transition-colors text-yellow-700 hover:text-yellow-800"
-                    >
-                      Login
-                    </motion.button>
-                  </Link>
-                  <Link href="/register">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      className="btn-gold px-6 py-2 rounded-xl font-premium"
-                    >
-                      Sign Up
-                    </motion.button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <div className="min-h-screen overflow-x-hidden" style={{ 
-        background: `linear-gradient(135deg, var(--secondary-oldlace) 0%, var(--neutral-white) 50%, var(--secondary-oldlace-dark) 100%)` 
-      }}>
-        {/* Hero Section */}
-      <section ref={heroRef} className="hero-luxury">
-        <AnimatePresence mode="wait">
+      {/* Hero Section - Cinematic */}
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Video Background Effect */}
+        <div className="absolute inset-0">
+          {/* Strong Dark Overlay for Better Text Visibility */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 z-10" />
           <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
+            initial={{ scale: 1.2 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 2, ease: [0.6, 0.01, 0.05, 0.95] }}
             className="absolute inset-0"
-            style={{
-              backgroundImage: `url('${heroSlides[currentSlide].image}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70 dark:from-black/80 dark:via-black/60 dark:to-black/80" />
+            <img
+              src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop"
+              alt="Hero"
+              className="w-full h-full object-cover brightness-75"
+            />
           </motion.div>
-        </AnimatePresence>
-
-        {/* Award-Winning Floating Elements */}
-        <motion.div
-          style={{ y: y1 }}
-          className="absolute top-20 left-4 sm:left-10 w-24 sm:w-32 h-24 sm:h-32 award-winning-animation opacity-20"
-        >
-          <div className="w-full h-full rounded-full blur-xl bg-gradient-to-br from-purple-500/10 to-transparent" />
-        </motion.div>
-        
-        <motion.div
-          style={{ y: y2, animationDelay: '-2s' }}
-          className="absolute top-40 right-4 sm:right-20 w-16 sm:w-24 h-16 sm:h-24 award-winning-animation opacity-30"
-        >
-          <div className="w-full h-full rounded-lg rotate-45 blur-lg bg-gradient-to-br from-green-500/10 to-transparent" />
-        </motion.div>
-        
-        <motion.div
-          style={{ y: y1, animationDelay: '-4s' }}
-          className="absolute bottom-20 left-1/4 w-20 sm:w-28 h-20 sm:h-28 award-winning-animation opacity-25"
-        >
-          <div className="w-full h-full rounded-full blur-xl bg-gradient-to-br from-yellow-200/20 to-transparent" />
-        </motion.div>
+          
+          {/* Animated Gradient Overlay */}
+          <motion.div
+            animate={{
+              background: [
+                'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
+                'radial-gradient(circle at 80% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
+                'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
+              ]
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+            className="absolute inset-0 z-10"
+          />
+        </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 container-luxury text-center text-white px-4">
+        <div ref={heroRef} className="relative z-20 container mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            style={{ opacity }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="mb-8"
           >
-            {/* Premium Logo Animation with Golden Touches */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={isHeroInView ? { opacity: 1, scale: 1 } : {}}
-              transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
-              className="flex items-center justify-center mb-8 sm:mb-12"
-            >
-              <div className="relative">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="w-16 sm:w-20 h-16 sm:h-20 border-2 rounded-full"
-                  style={{ 
-                    borderImage: 'linear-gradient(45deg, #D4AF37, #7B57CE, #8F9D68) 1',
-                    borderColor: '#D4AF37'
-                  }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Crown className="w-8 sm:w-10 h-8 sm:h-10 text-yellow-400" />
-                </div>
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1], opacity: [0.7, 1, 0.7] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full"
-                />
-              </div>
-              <div className="ml-4 sm:ml-6 w-1 h-16 sm:h-20 bg-gradient-to-b from-yellow-400 via-purple-500 to-green-600" />
-              <div className="ml-2 flex flex-col items-start">
-                <span className="text-2xl sm:text-3xl font-golden text-gradient-gold">EstoSpaces</span>
-                <span className="text-xs sm:text-sm font-premium text-yellow-200 tracking-wider">LUXURY ESTATES</span>
-              </div>
-            </motion.div>
-            
-            {/* Dynamic Title */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentSlide}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className="mb-6 sm:mb-8"
-              >
-                <h1 className="text-display-1 font-luxury mb-4 leading-tight">
-                  <span className="text-white">{heroSlides[currentSlide].title}</span>
-                  <span className="block text-gradient-gold font-golden">
-                    {heroSlides[currentSlide].subtitle}
-                  </span>
-                </h1>
-                
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1, delay: 0.5 }}
-                  className="text-body-premium mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4 text-yellow-100"
-                >
-                  {heroSlides[currentSlide].description}
-                </motion.p>
-              </motion.div>
-            </AnimatePresence>     
-            {/* Premium Search Section with Golden Touches */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={isHeroInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 1, delay: 0.8 }}
-              className="max-w-4xl mx-auto"
-            >
-              <div className="glass-morphism rounded-3xl p-6 sm:p-8 luxury-shadow border border-yellow-400/20">
-                <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-amber-500/30 bg-amber-500/5 backdrop-blur-sm">
+              <Crown className="w-5 h-5 text-amber-500" />
+              <span className="text-sm tracking-[0.3em] uppercase text-amber-500 font-light">
+                Luxury Real Estate
+              </span>
+            </div>
+          </motion.div>
+
+          <h1 className="hero-title text-6xl md:text-7xl lg:text-8xl font-light mb-8 leading-tight px-4">
+            <span className="block text-white drop-shadow-2xl" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
+              Extraordinary
+            </span>
+            <span className="block bg-gradient-to-r from-amber-300 via-amber-400 to-amber-300 bg-clip-text text-transparent drop-shadow-2xl" 
+                  style={{ fontFamily: "'Playfair Display', serif", filter: 'drop-shadow(0 4px 20px rgba(251, 191, 36, 0.3))' }}>
+              Living Spaces
+            </span>
+          </h1>
+
+          <p className="hero-subtitle text-lg md:text-xl text-gray-200 max-w-3xl mx-auto mb-12 font-light leading-relaxed px-4" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+            Discover a curated collection of the world's most prestigious properties,
+            <br className="hidden md:block" />
+            where architectural excellence meets unparalleled luxury
+          </p>
+
+          {/* Search Bar - Premium Design */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 1 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="relative group px-4">
+              <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative bg-black/60 backdrop-blur-xl border border-white/20 rounded-2xl p-3 shadow-2xl">
+                <div className="flex flex-col md:flex-row gap-3">
                   <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-6 h-6 text-yellow-400" />
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400" />
                     <input
                       type="text"
-                      placeholder="Search premium services..."
+                      placeholder="Location, City, or Neighborhood"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl outline-none pl-12 pr-4 py-4 text-white placeholder-gray-400 focus:bg-white/10 focus:border-amber-500/50 transition-all"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="premium-input pl-12 font-premium"
-                      style={{ 
-                        background: 'rgba(255, 248, 235, 0.9)',
-                        border: '2px solid transparent',
-                        backgroundClip: 'padding-box'
-                      }}
                     />
                   </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn-gold micro-bounce px-8 py-4 rounded-2xl font-premium font-semibold text-white"
-                  >
-                    <span className="flex items-center gap-2">
-                      <Sparkles className="w-5 h-5" />
-                      Discover Luxury
-                      <ArrowRight className="w-5 h-5" />
+                  <button className="relative overflow-hidden px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl font-medium group/btn shadow-lg hover:shadow-amber-500/50 transition-all">
+                    <span className="relative z-10 flex items-center justify-center gap-2 text-white">
+                      <Search className="w-5 h-5" />
+                      Explore
                     </span>
-                  </motion.button>
+                    <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                  </button>
                 </div>
-                
-                {/* Quick Search Tags */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1, delay: 1.2 }}
-                  className="flex flex-wrap gap-2 mt-4 justify-center"
-                >
-                  {['Enterprise', 'Startup', 'Innovation', 'Premium'].map((tag, index) => (
-                    <motion.button
-                      key={tag}
-                      whileHover={{ scale: 1.05 }}
-                      className="px-4 py-2 rounded-full text-sm font-premium bg-yellow-400/20 text-yellow-100 hover:bg-yellow-400/30 transition-all duration-300"
-                    >
-                      {tag}
-                    </motion.button>
-                  ))}
-                </motion.div>
               </div>
-            </motion.div>
+            </div>
+          </motion.div>
 
-            {/* Golden Slide Indicators */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={isHeroInView ? { opacity: 1 } : {}}
-              transition={{ duration: 1, delay: 1 }}
-              className="flex justify-center space-x-4 mt-12"
-            >
-              {heroSlides.map((_, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                  className={`w-4 h-4 rounded-full transition-all duration-300 border-2 ${
-                    index === currentSlide 
-                      ? 'scale-125 bg-yellow-400 border-yellow-400 shadow-lg shadow-yellow-400/50' 
-                      : 'bg-transparent border-yellow-400/50 hover:border-yellow-400'
-                  }`}
-                />
-              ))}
-            </motion.div>
+          {/* Scroll Indicator */}
+          <motion.div
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2"
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-xs tracking-widest uppercase text-gray-500">Scroll</span>
+              <ChevronDown className="w-6 h-6 text-amber-500" />
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Award-Winning Features Section */}
-      <section className="award-section section-padding-luxury">
-        <div className="container-luxury">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-display-2 font-golden mb-6 text-gradient-premium">
-              Why Choose EstoSpaces
+      {/* Featured Properties - Magazine Layout */}
+      <section ref={featuredRef} className="relative py-24 md:py-32 bg-gradient-to-b from-black via-zinc-900 to-black">
+        <div className="container mx-auto px-4 md:px-6">
+          {/* Section Header */}
+          <div className="fade-in-section text-center mb-16 md:mb-20">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={featuredInView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.8 }}
+              className="inline-block mb-6"
+            >
+              <div className="flex items-center gap-3 px-6 py-3 rounded-full border border-amber-500/30 bg-amber-500/10 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-amber-400" />
+                <span className="text-sm tracking-[0.2em] uppercase text-amber-400 font-medium">Featured Collection</span>
+              </div>
+            </motion.div>
+            
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light mb-6 text-white px-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Signature Properties
             </h2>
-            <div className="w-24 h-1 rounded-full mx-auto mb-8 bg-gradient-to-r from-yellow-400 via-purple-500 to-green-600" />
-            <p className="text-body-premium max-w-3xl mx-auto" 
-               style={{ color: 'var(--tertiary-moss-dark)' }}>
-              Experience the pinnacle of innovation with our award-winning platform, 
-              designed for discerning clients who demand excellence.
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light px-4">
+              Handpicked residences that redefine luxury living
             </p>
-          </motion.div>
+          </div>
 
-          <div className="award-winning-grid">
+          {/* Properties Grid - Staggered Layout */}
+          <div className="space-y-20 md:space-y-32">
+            {featuredProperties.map((property, index) => (
+              <motion.div
+                key={property.id}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 1, delay: index * 0.2 }}
+                className={`fade-in-section grid md:grid-cols-2 gap-8 md:gap-12 items-center ${
+                  index % 2 === 1 ? 'md:flex-row-reverse' : ''
+                }`}
+              >
+                {/* Image */}
+                <Link href={`/properties/${property.id}`}>
+                  <div className={`relative group cursor-pointer ${index % 2 === 1 ? 'md:order-2' : ''}`}>
+                    <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <img
+                        src={property.images[0]}
+                        alt={property.title}
+                        className="parallax-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                      />
+                      
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center">
+                          <Play className="w-6 h-6 text-white ml-1" />
+                        </div>
+                      </div>
+
+                      {/* Featured Badge */}
+                      <div className="absolute top-6 right-6 z-20">
+                        <div className="px-4 py-2 rounded-full bg-amber-500/90 backdrop-blur-sm">
+                          <span className="text-xs font-medium tracking-wider uppercase">Featured</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Decorative Element */}
+                    <div className="absolute -bottom-6 -right-6 w-32 h-32 border border-amber-500/20 rounded-3xl -z-10"></div>
+                  </div>
+                </Link>
+
+                {/* Content */}
+                <div className={`${index % 2 === 1 ? 'md:order-1' : ''} px-4 md:px-0`}>
+                  <div className="space-y-6">
+                    {/* Property Type */}
+                    <div className="flex items-center gap-3 text-amber-400">
+                      <div className="w-12 h-px bg-amber-400"></div>
+                      <span className="text-sm tracking-[0.2em] uppercase font-medium">
+                        {property.type === 'house' ? 'Villa' : 'Penthouse'}
+                      </span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-3xl md:text-4xl lg:text-5xl font-light text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      {property.title}
+                    </h3>
+
+                    {/* Location */}
+                    <div className="flex items-center gap-2 text-gray-300">
+                      <MapPin className="w-5 h-5 text-amber-400" />
+                      <span className="text-base md:text-lg">{property.location}</span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-base md:text-lg text-gray-300 leading-relaxed font-light">
+                      {property.description}
+                    </p>
+
+                    {/* Details */}
+                    <div className="flex items-center gap-6 md:gap-8 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Bed className="w-5 h-5 text-amber-400" />
+                        <span className="text-gray-200">{property.bedrooms} Beds</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Bath className="w-5 h-5 text-amber-400" />
+                        <span className="text-gray-200">{property.bathrooms} Baths</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Square className="w-5 h-5 text-amber-400" />
+                        <span className="text-gray-200">{property.area?.toLocaleString() || 'N/A'} sqft</span>
+                      </div>
+                    </div>
+
+                    {/* Price & CTA */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-6 border-t border-white/10">
+                      <div>
+                        <div className="text-sm text-gray-400 mb-1">Starting from</div>
+                        <div className="text-3xl md:text-4xl font-light text-white">
+                          ${property.price.toLocaleString()}
+                          <span className="text-lg text-gray-400">/mo</span>
+                        </div>
+                      </div>
+                      <Link href={`/properties/${property.id}`}>
+                        <button className="group/btn flex items-center gap-2 px-6 py-3 border border-amber-500/40 rounded-full hover:bg-amber-500/10 hover:border-amber-500/60 transition-all text-white">
+                          <span>View Details</span>
+                          <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* View All */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center mt-20"
+          >
+            <Link href="/browse">
+              <button className="relative overflow-hidden px-12 py-5 border border-amber-500/30 rounded-full group/btn">
+                <span className="relative z-10 flex items-center gap-3 text-lg">
+                  Explore All Properties
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-2 transition-transform" />
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 via-amber-500/10 to-amber-500/0 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+              </button>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Why Choose Us - Elegant Grid */}
+      <section className="relative py-24 md:py-32 bg-black">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="fade-in-section text-center mb-16 md:mb-20">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light mb-6 text-white px-4" style={{ fontFamily: "'Playfair Display', serif" }}>
+              The EstoSpaces Difference
+            </h2>
+            <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto font-light px-4">
+              Uncompromising excellence in every detail
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 md:gap-12">
             {[
               {
-                icon: Crown,
-                title: "Exclusive Access",
-                description: "Curated collection of premium services and innovative solutions",
-                color: '#D4AF37',
-                bgGradient: 'from-yellow-400/20 to-yellow-600/20'
-              },
-              {
                 icon: Shield,
-                title: "Verified Quality",
-                description: "Every service undergoes rigorous verification and quality assessment",
-                color: '#7B57CE',
-                bgGradient: 'from-purple-500/20 to-purple-700/20'
+                title: 'Verified Excellence',
+                description: 'Every property undergoes rigorous verification to ensure authenticity and quality standards'
               },
               {
-                icon: Gem,
-                title: "Premium Support",
-                description: "White-glove service with dedicated specialists available 24/7",
-                color: '#8F9D68',
-                bgGradient: 'from-green-500/20 to-green-700/20'
+                icon: Award,
+                title: 'Award-Winning Service',
+                description: 'Recognized globally for exceptional client experiences and innovative solutions'
+              },
+              {
+                icon: Globe,
+                title: 'Global Reach',
+                description: 'Access to exclusive properties in the world\'s most prestigious locations'
               }
             ].map((feature, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                className="premium-card-hover card-luxury p-8 text-center luxury-shadow border border-yellow-400/10"
-              >
-                <div className="mb-6 flex justify-center">
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center micro-glow bg-gradient-to-br ${feature.bgGradient}`}>
-                    <feature.icon className="w-8 h-8" style={{ color: feature.color }} />
-                  </div>
-                </div>
-                <h3 className="text-2xl font-display font-semibold mb-4" 
-                    style={{ color: 'var(--neutral-dark)' }}>
-                  {feature.title}
-                </h3>
-                <p className="text-lg leading-relaxed font-premium" 
-                   style={{ color: 'var(--tertiary-moss-dark)' }}>
-                  {feature.description}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Services Section */}
-      <section className="section-padding-luxury bg-gradient-to-br from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="container-luxury">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-display-2 font-display mb-6 text-gradient-moss">
-              Featured Services
-            </h2>
-            <div className="divider-moss mb-8" />
-            <p className="text-body-premium max-w-3xl mx-auto" 
-               style={{ color: 'var(--neutral-dark)' }}>
-              Discover our handpicked selection of extraordinary services that define premium excellence.
-            </p>
-          </motion.div>
-
-          <div className="award-winning-grid">
-            {featuredProperties.map((property, index) => (
-              <motion.div
-                key={property.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.2 }}
-                viewport={{ once: true }}
-                className="property-card-luxury luxury-shadow"
+                className="fade-in-section group"
               >
-                <div className="property-image h-64 relative">
-                  <img
-                    src={property.images[0]}
-                    alt={property.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="badge-premium">Featured</span>
-                  </div>
-                  <div className="absolute top-4 right-4">
-                    <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors">
-                      <Heart className="w-5 h-5 text-white" />
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-3xl font-bold text-gradient-iris">
-                      ${property.price.toLocaleString()}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-current" style={{ color: 'var(--tertiary-moss)' }} />
-                      <span className="text-sm font-medium" style={{ color: 'var(--tertiary-moss)' }}>4.9</span>
-                    </div>
-                  </div>
+                <div className="relative p-8 border border-white/10 rounded-2xl hover:border-amber-500/30 transition-all duration-500 bg-zinc-900/30">
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
                   
-                  <h3 className="text-xl font-display font-semibold mb-2" 
-                      style={{ color: 'var(--neutral-dark)' }}>
-                    {property.title}
-                  </h3>
-                  
-                  <div className="flex items-center gap-1 mb-4 text-gray-600">
-                    <MapPin className="w-4 h-4" />
-                    <span className="text-sm font-premium">{property.location}</span>
+                  <div className="relative">
+                    <div className="w-16 h-16 mb-6 rounded-2xl bg-gradient-to-br from-amber-500/30 to-orange-500/30 flex items-center justify-center">
+                      <feature.icon className="w-8 h-8 text-amber-400" />
+                    </div>
+                    
+                    <h3 className="text-2xl font-light mb-4 text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+                      {feature.title}
+                    </h3>
+                    
+                    <p className="text-gray-300 leading-relaxed font-light">
+                      {feature.description}
+                    </p>
                   </div>
-                  
-                  <div className="flex items-center gap-4 mb-6 text-sm" 
-                       style={{ color: 'var(--tertiary-moss-dark)' }}>
-                    <div className="flex items-center gap-1">
-                      <Bed className="w-4 h-4" />
-                      <span>{property.bedrooms}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Bath className="w-4 h-4" />
-                      <span>{property.bathrooms}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Square className="w-4 h-4" />
-                      <span>{property.area} sq ft</span>
-                    </div>
-                  </div>
-                  
-                  <Link href={`/properties/${property.id}`}>
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full btn-moss py-3 rounded-xl font-semibold text-white micro-bounce"
-                    >
-                      View Details
-                    </motion.button>
-                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -558,59 +530,97 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Premium CTA Section */}
-      <section className="award-section section-padding-luxury">
-        <div className="container-luxury text-center">
+      {/* CTA Section - Cinematic */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&h=1080&fit=crop"
+            alt="CTA Background"
+            className="w-full h-full object-cover brightness-50"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-black/80"></div>
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 md:px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto"
+            transition={{ duration: 1 }}
           >
-            <h2 className="text-display-2 font-display mb-6 text-gradient-luxury">
-              Ready to Find Your Dream Property?
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-light mb-8 text-white" style={{ fontFamily: "'Playfair Display', serif", textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
+              Begin Your Journey
             </h2>
-            <div className="divider-luxury mb-8" />
-            <p className="text-body-premium mb-12" 
-               style={{ color: 'var(--tertiary-moss-dark)' }}>
-              Join thousands of satisfied clients who trust EstoSpaces for premium services and innovation.
+            <p className="text-lg md:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-light" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+              Discover extraordinary properties that transcend expectations
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href="/services">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn-premium px-8 py-4 rounded-2xl font-premium font-semibold text-white micro-bounce"
-                >
-                  <span className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center">
+              <Link href="/register">
+                <button className="relative overflow-hidden px-10 py-5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-lg font-medium group/btn shadow-xl hover:shadow-amber-500/50 transition-all text-white w-full sm:w-auto">
+                  <span className="relative z-10 flex items-center justify-center gap-2">
                     <Crown className="w-5 h-5" />
-                    Explore Services
-                    <ArrowRight className="w-5 h-5" />
+                    Get Started
                   </span>
-                </motion.button>
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                </button>
               </Link>
               
-              <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="btn-gold px-8 py-4 rounded-2xl font-premium font-semibold text-white micro-bounce"
-                >
-                  <span className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    Get Started
-                    <Diamond className="w-5 h-5" />
-                  </span>
-                </motion.button>
+              <Link href="/browse">
+                <button className="px-10 py-5 border border-white/40 rounded-full text-lg font-medium hover:bg-white/10 hover:border-white/60 transition-all flex items-center justify-center gap-2 text-white w-full sm:w-auto">
+                  Explore Collection
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </Link>
             </div>
           </motion.div>
         </div>
       </section>
-      </div>
-    </>
+
+      {/* Footer - Minimal Elegant */}
+      <footer className="relative py-16 bg-black border-t border-white/10">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12 mb-12">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Crown className="w-8 h-8 text-amber-400" />
+                <span className="text-2xl font-light text-white" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  EstoSpaces
+                </span>
+              </div>
+              <p className="text-gray-400 font-light">
+                Redefining luxury real estate
+              </p>
+            </div>
+
+            {[
+              { title: 'Company', links: ['About', 'Services', 'Contact'] },
+              { title: 'Properties', links: ['Buy', 'Rent', 'Sell'] },
+              { title: 'Legal', links: ['Privacy', 'Terms', 'Cookies'] }
+            ].map((column, index) => (
+              <div key={index}>
+                <h4 className="text-sm tracking-[0.2em] uppercase text-gray-400 mb-4 font-medium">
+                  {column.title}
+                </h4>
+                <ul className="space-y-2">
+                  {column.links.map((link) => (
+                    <li key={link}>
+                      <a href="#" className="text-gray-300 hover:text-white transition-colors font-light">
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="pt-8 border-t border-white/10 text-center text-gray-400 text-sm font-light">
+            © 2024 EstoSpaces. All rights reserved.
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
 
