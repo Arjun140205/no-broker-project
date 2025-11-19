@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import Head from 'next/head';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Property } from '../types';
 import Link from 'next/link';
@@ -7,9 +8,7 @@ import { useInView } from 'react-intersection-observer';
 import { 
   Search, 
   MapPin, 
-  Star, 
   ArrowRight, 
-  Heart,
   Bath,
   Bed,
   Square,
@@ -17,7 +16,6 @@ import {
   Sparkles,
   ChevronDown,
   Play,
-  TrendingUp,
   Award,
   Shield,
   Globe
@@ -192,52 +190,63 @@ const Home = () => {
     initGSAP();
   }, []);
 
-  const [heroRef, heroInView] = useInView({ threshold: 0.3, triggerOnce: true });
+  const [heroRef] = useInView({ threshold: 0.3, triggerOnce: true });
   const [featuredRef, featuredInView] = useInView({ threshold: 0.2, triggerOnce: true });
 
   return (
-    <div ref={containerRef} className="relative bg-[#0A0A0A] text-white overflow-hidden">
-      {/* Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 origin-left z-50"
-        style={{ scaleX }}
-      />
+    <>
+      <Head>
+        <title>EstoSpaces - Luxury Real Estate & Premium Properties</title>
+        <meta name="description" content="Discover extraordinary luxury properties worldwide. Award-winning real estate platform featuring exclusive villas, penthouses, and premium homes in prestigious locations." />
+        <meta name="keywords" content="luxury real estate, premium properties, luxury homes, penthouses, villas, exclusive properties" />
+        <meta property="og:title" content="EstoSpaces - Luxury Real Estate & Premium Properties" />
+        <meta property="og:description" content="Discover extraordinary luxury properties worldwide" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href="https://estospaces.com" />
+      </Head>
+
+      <div ref={containerRef} className="relative bg-[#0A0A0A] text-white overflow-hidden">
+        {/* Progress Bar */}
+        <motion.div
+          className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 origin-left z-50"
+          style={{ scaleX }}
+        />
 
       {/* Hero Section - Cinematic */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Video Background Effect */}
-        <div className="absolute inset-0">
-          {/* Strong Dark Overlay for Better Text Visibility */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/80 z-10" />
-          <motion.div
-            initial={{ scale: 1.2 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 2, ease: [0.6, 0.01, 0.05, 0.95] }}
-            className="absolute inset-0"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop"
-              alt="Hero"
-              className="w-full h-full object-cover brightness-75"
-            />
-          </motion.div>
-          
-          {/* Animated Gradient Overlay */}
-          <motion.div
-            animate={{
-              background: [
-                'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
-                'radial-gradient(circle at 80% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
-                'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.12) 0%, transparent 50%)',
-              ]
-            }}
-            transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
-            className="absolute inset-0 z-10"
+        {/* Background Image Layer - z-0 */}
+        <motion.div
+          initial={{ scale: 1.2 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 2, ease: [0.6, 0.01, 0.05, 0.95] }}
+          className="absolute inset-0 z-0"
+        >
+          <img
+            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop"
+            alt="Luxury Property Hero"
+            className="w-full h-full object-cover brightness-50"
           />
-        </div>
+        </motion.div>
+        
+        {/* Dark Overlay - z-[1] */}
+        <div className="absolute inset-0 z-[1] bg-gradient-to-b from-black/80 via-black/70 to-black/85" />
+        
+        {/* Animated Gradient Overlay - z-[2] */}
+        <motion.div
+          animate={{
+            background: [
+              'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 50%)',
+              'radial-gradient(circle at 80% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 50%)',
+              'radial-gradient(circle at 20% 50%, rgba(251, 191, 36, 0.15) 0%, transparent 50%)',
+            ]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+          className="absolute inset-0 z-[2]"
+        />
 
-        {/* Hero Content */}
-        <div ref={heroRef} className="relative z-20 container mx-auto px-6 text-center">
+        {/* Hero Content - z-[10] */}
+        <div ref={heroRef} className="relative z-[10] container mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -301,15 +310,15 @@ const Home = () => {
             </div>
           </motion.div>
 
-          {/* Scroll Indicator */}
+          {/* Scroll Indicator - z-[11] */}
           <motion.div
             animate={{ y: [0, 12, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-            className="absolute bottom-12 left-1/2 -translate-x-1/2"
+            className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[11]"
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xs tracking-widest uppercase text-gray-500">Scroll</span>
-              <ChevronDown className="w-6 h-6 text-amber-500" />
+              <span className="text-xs tracking-widest uppercase text-gray-400">Scroll</span>
+              <ChevronDown className="w-6 h-6 text-amber-400" />
             </div>
           </motion.div>
         </div>
@@ -357,30 +366,33 @@ const Home = () => {
                 <Link href={`/properties/${property.id}`}>
                   <div className={`relative group cursor-pointer ${index % 2 === 1 ? 'md:order-2' : ''}`}>
                     <div className="relative overflow-hidden rounded-3xl aspect-[4/3]">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      {/* Base Image - z-0 */}
                       <img
                         src={property.images[0]}
-                        alt={property.title}
-                        className="parallax-image w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                        alt={`${property.title} - ${property.location}`}
+                        className="parallax-image absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 z-0"
                       />
                       
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                        <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center">
+                      {/* Hover Gradient Overlay - z-[1] */}
+                      <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Play Button - z-[2] */}
+                      <div className="absolute inset-0 z-[2] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="w-16 h-16 rounded-full border-2 border-white flex items-center justify-center bg-black/20 backdrop-blur-sm">
                           <Play className="w-6 h-6 text-white ml-1" />
                         </div>
                       </div>
 
-                      {/* Featured Badge */}
-                      <div className="absolute top-6 right-6 z-20">
-                        <div className="px-4 py-2 rounded-full bg-amber-500/90 backdrop-blur-sm">
-                          <span className="text-xs font-medium tracking-wider uppercase">Featured</span>
+                      {/* Featured Badge - z-[3] */}
+                      <div className="absolute top-6 right-6 z-[3]">
+                        <div className="px-4 py-2 rounded-full bg-amber-500 backdrop-blur-sm shadow-lg">
+                          <span className="text-xs font-medium tracking-wider uppercase text-white">Featured</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Decorative Element */}
-                    <div className="absolute -bottom-6 -right-6 w-32 h-32 border border-amber-500/20 rounded-3xl -z-10"></div>
+                    {/* Decorative Element - Behind card */}
+                    <div className="absolute -bottom-6 -right-6 w-32 h-32 border border-amber-500/20 rounded-3xl -z-[1]"></div>
                   </div>
                 </Link>
 
@@ -620,7 +632,8 @@ const Home = () => {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   );
 };
 
