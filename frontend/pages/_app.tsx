@@ -3,14 +3,10 @@ import { AuthProvider } from '../contexts/AuthContext';
 import { SocketProvider } from '../contexts/SocketContext';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { SmoothScrollProvider } from '../contexts/SmoothScrollContext';
-import SharedNavigation from '../components/SharedNavigation';
 import { Toaster } from 'react-hot-toast';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  // Use shared navigation for all pages
-  const shouldUseLayout = false;
-
   return (
     <ThemeProvider>
       <SmoothScrollProvider>
@@ -44,10 +40,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 },
               }}
             />
-            <>
-              <SharedNavigation />
-              <Component {...pageProps} />
-            </>
+            <Component {...pageProps} />
           </SocketProvider>
         </AuthProvider>
       </SmoothScrollProvider>
