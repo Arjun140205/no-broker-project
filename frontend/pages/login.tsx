@@ -1,4 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
 import { useAuth } from '../contexts/AuthContext';
 import { LoginCredentials } from '../types';
 import Link from 'next/link';
@@ -6,7 +9,8 @@ import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { Input } from '../components/ui/input';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles, Crown, Shield } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
+
 const Login = () => {
   const { login, error, loading, user } = useAuth();
   const router = useRouter();
@@ -44,115 +48,57 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{
-        background: 'linear-gradient(135deg, #7B57CE 0%, #D4AF37 50%, #8F9D68 100%)'
-      }}>
-        {/* Premium Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255, 248, 235, 0.3) 0%, transparent 50%),
-                             radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.3) 0%, transparent 50%)`
-          }} />
+    <>
+      <Head>
+        <title>Sign In - EstoSpaces</title>
+        <meta name="description" content="Sign in to your EstoSpaces account" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      </Head>
+
+      <div className="min-h-screen relative overflow-hidden bg-black text-white">
+        <div className="absolute inset-0 z-0">
+          <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&h=1080&fit=crop" alt="Background" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/80" />
         </div>
 
-        {/* Floating Elements */}
         <motion.div
-        className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-20"
-        style={{ background: 'linear-gradient(135deg, #FFF8EB, #D4AF37)' }}
-        animate={{ y: [0, -30, 0], scale: [1, 1.1, 1] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-10"
+          style={{ background: 'linear-gradient(135deg, #ffffff, #888888)' }}
+          animate={{ y: [0, -30, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-20 right-20 w-40 h-40 rounded-full blur-3xl opacity-20"
-          style={{ background: 'linear-gradient(135deg, #8F9D68, #7B57CE)' }}
+          className="absolute bottom-20 right-20 w-40 h-40 rounded-full blur-3xl opacity-10"
+          style={{ background: 'linear-gradient(135deg, #888888, #ffffff)' }}
           animate={{ y: [0, 30, 0], scale: [1, 1.2, 1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
-          
-          {/* Left Side - Branding */}
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="hidden md:block text-white space-y-8"
-          >
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-2xl"
-                >
-                  <Crown className="w-8 h-8 text-white" />
-                </motion.div>
-                <div>
-                  <h1 className="text-5xl font-golden text-gradient-gold">EstoSpaces</h1>
-                  <p className="text-yellow-200 text-sm font-premium tracking-wider">AWARD-WINNING PLATFORM</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h2 className="text-4xl font-display leading-tight">
-                Welcome to the Future of <span className="text-gradient-gold font-golden">Premium Experiences</span>
-              </h2>
-              <p className="text-xl text-yellow-100 font-premium leading-relaxed">
-                Join thousands of users who trust our award-winning platform for exceptional service and innovation.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Shield, label: 'Secure & Trusted', value: '256-bit SSL' },
-                { icon: Crown, label: 'Premium Quality', value: 'Award Winning' },
-                { icon: Sparkles, label: 'Active Users', value: '50,000+' },
-                { icon: ArrowRight, label: 'Success Rate', value: '99.9%' }
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
-                  className="glass-morphism rounded-2xl p-4 border border-yellow-400/20"
-                >
-                  <stat.icon className="w-6 h-6 text-yellow-400 mb-2" />
-                  <p className="text-sm text-yellow-200 font-premium">{stat.label}</p>
-                  <p className="text-lg font-semibold text-white">{stat.value}</p>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Right Side - Login Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-            className="w-full"
-          >
-            <div className="glass-morphism rounded-3xl p-8 md:p-10 border border-yellow-400/20 shadow-2xl" style={{
-              background: 'rgba(255, 248, 235, 0.95)',
-              backdropFilter: 'blur(20px)'
-            }}>
-              {/* Mobile Logo */}
-              <div className="md:hidden text-center mb-8">
-                <div className="flex items-center justify-center space-x-3 mb-2">
-                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-yellow-400 to-yellow-600">
-                    <Crown className="w-6 h-6 text-white" />
-                  </div>
-                  <h1 className="text-3xl font-golden text-gradient-gold">EstoSpaces</h1>
-                </div>
+        <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="rounded-lg border border-white/10 bg-white/5 backdrop-blur-md p-8 md:p-10"
+            >
+              <div className="text-center mb-12">
+                <h1 className="text-4xl font-light mb-2 text-white" style={{ fontFamily: 'Playfair Display' }}>
+                  EstoSpaces
+                </h1>
+                <p className="text-gray-400 font-light text-sm tracking-widest" style={{ fontFamily: 'Inter' }}>
+                  SIGN IN
+                </p>
               </div>
 
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-display font-bold mb-2" style={{ color: '#7B57CE' }}>
+                <h2 className="text-3xl font-light mb-3 text-white" style={{ fontFamily: 'Playfair Display' }}>
                   Welcome Back
                 </h2>
-                <p className="text-gray-600 font-premium">
-                  Sign in to continue your premium experience
+                <p className="text-gray-400 font-light" style={{ fontFamily: 'Cormorant Garamond' }}>
+                  Sign in to your account to continue
                 </p>
               </div>
 
@@ -160,19 +106,19 @@ const Login = () => {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="rounded-2xl bg-red-50 border-2 border-red-200 p-4 mb-6"
+                  className="rounded-lg bg-red-500/10 border border-red-500/30 p-4 mb-6"
                 >
-                  <div className="text-sm text-red-700 font-premium">{error || localError}</div>
+                  <div className="text-sm text-red-400 font-light">{error || localError}</div>
                 </motion.div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-premium font-semibold" style={{ color: '#7B57CE' }}>
+                  <label htmlFor="email" className="text-sm font-light text-gray-300" style={{ fontFamily: 'Cormorant Garamond' }}>
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-yellow-600" />
+                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
                     <Input
                       id="email"
                       name="email"
@@ -181,19 +127,18 @@ const Login = () => {
                       required
                       value={credentials.email}
                       onChange={handleChange}
-                      className="pl-12 h-14 rounded-2xl border-2 border-gray-200 focus:border-yellow-400 font-premium text-lg"
+                      className="pl-12 h-12 rounded-lg border border-white/10 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-colors font-light"
                       placeholder="your@email.com"
-                      style={{ background: 'white' }}
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="password" className="text-sm font-premium font-semibold" style={{ color: '#7B57CE' }}>
+                  <label htmlFor="password" className="text-sm font-light text-gray-300" style={{ fontFamily: 'Cormorant Garamond' }}>
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-yellow-600" />
+                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/40" />
                     <Input
                       id="password"
                       name="password"
@@ -202,14 +147,13 @@ const Login = () => {
                       required
                       value={credentials.password}
                       onChange={handleChange}
-                      className="pl-12 pr-12 h-14 rounded-2xl border-2 border-gray-200 focus:border-yellow-400 font-premium text-lg"
+                      className="pl-12 pr-12 h-12 rounded-lg border border-white/10 bg-white/5 text-white placeholder-gray-500 focus:outline-none focus:border-white/30 transition-colors font-light"
                       placeholder="Enter your password"
-                      style={{ background: 'white' }}
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-yellow-600 transition-colors"
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/40 hover:text-white/60 transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -219,53 +163,49 @@ const Login = () => {
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full h-14 rounded-2xl font-premium font-semibold text-white text-lg shadow-lg transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(135deg, #D4AF37 0%, #B8941F 100%)',
-                    boxShadow: '0 10px 25px -5px rgba(212, 175, 55, 0.4)'
-                  }}
+                  className="w-full h-12 rounded-lg font-light text-black bg-white hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+                  style={{ fontFamily: 'Cormorant Garamond' }}
                 >
                   {loading ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <>
+                      <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                       <span>Signing in...</span>
-                    </div>
+                    </>
                   ) : (
-                    <div className="flex items-center justify-center space-x-2">
+                    <>
                       <span>Sign In</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </div>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
                   )}
                 </motion.button>
               </form>
 
               <div className="mt-8 text-center space-y-4">
-                <p className="text-sm text-gray-600 font-premium">
+                <p className="text-sm text-gray-400 font-light" style={{ fontFamily: 'Cormorant Garamond' }}>
                   Don't have an account?{' '}
                   <Link 
                     href="/register" 
-                    className="font-semibold hover:underline"
-                    style={{ color: '#7B57CE' }}
+                    className="text-white hover:text-gray-300 transition-colors font-light"
                   >
-                    Create one now
+                    Create one
                   </Link>
                 </p>
                 <Link 
                   href="/" 
-                  className="inline-flex items-center space-x-2 text-sm font-premium hover:underline"
-                  style={{ color: '#8F9D68' }}
+                  className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors font-light"
+                  style={{ fontFamily: 'Cormorant Garamond' }}
                 >
                   <ArrowRight className="w-4 h-4 rotate-180" />
                   <span>Back to Home</span>
                 </Link>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
