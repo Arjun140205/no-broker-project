@@ -30,7 +30,11 @@ async function main() {
       description: 'A beautiful test apartment',
       price: 1500,
       location: 'Test City',
+      city: 'Test City',
+      state: 'Test State',
       type: 'flat',
+      images: ['/properties/images/1.jpg', '/properties/images/2.jpg'],
+      amenities: ['WiFi', 'Parking', 'AC'],
       owner: { connect: { id: owner.id } },
     },
   });
@@ -60,6 +64,9 @@ async function main() {
       property: { connect: { id: property.id } },
       user: { connect: { id: seeker.id } },
       owner: { connect: { id: owner.id } },
+      checkIn: new Date('2025-12-10'),
+      checkOut: new Date('2025-12-15'),
+      totalAmount: 7500,
       status: 'pending',
     },
   });
