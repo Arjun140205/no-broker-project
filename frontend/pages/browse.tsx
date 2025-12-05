@@ -303,28 +303,31 @@ const Browse = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="container-custom relative z-10">
+      <section className="relative py-20 bg-gradient-to-b from-black via-gray-950 to-black text-white overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%)' }} />
+        </div>
+        <div className="container mx-auto px-6 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <div className="flex items-center justify-center mb-6">
-              <Crown className="w-12 h-12 text-amber-400 mr-3" />
-              <div className="w-1 h-12 bg-gradient-to-b from-amber-400 to-transparent" />
-            </div>
-            <h1 className="text-5xl md:text-6xl font-display font-bold mb-6">
-              Discover Luxury
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
-                Properties Worldwide
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.3 }} className="inline-block mb-8">
+              <div className="px-6 py-3 rounded-full border border-white/20 bg-white/5 backdrop-blur-md">
+                <span className="text-white/80 text-sm tracking-widest font-light" style={{ fontFamily: 'Inter' }}>CURATED ESTATES</span>
+              </div>
+            </motion.div>
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-light mb-6 tracking-tight" style={{ fontFamily: 'Playfair Display' }}>
+              Discover Refined
+              <span className="block bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+                Properties
               </span>
             </h1>
-            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light leading-relaxed" style={{ fontFamily: 'Cormorant Garamond' }}>
               Explore our curated collection of premium properties in the world's most prestigious locations.
             </p>
           </motion.div>
@@ -336,7 +339,7 @@ const Browse = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-6xl mx-auto"
           >
-            <div className="glass-effect rounded-3xl p-6 shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 shadow-2xl border border-white/10">
               <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1 relative">
                   <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 w-6 h-6 text-gray-400" />
@@ -345,7 +348,8 @@ const Browse = () => {
                     placeholder="Search by location, property name, or features..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-16 pr-6 py-4 bg-transparent text-gray-800 placeholder-gray-500 text-lg focus:outline-none"
+                    className="w-full pl-16 pr-6 py-4 bg-transparent text-white placeholder-gray-400 text-lg focus:outline-none"
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   />
                 </div>
                 <div className="flex items-center space-x-4">
@@ -353,9 +357,10 @@ const Browse = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`flex items-center space-x-2 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 ${
-                      showFilters ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-800 hover:bg-white'
+                    className={`flex items-center space-x-2 px-6 py-4 rounded-xl font-light transition-all duration-300 ${
+                      showFilters ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
                     }`}
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   >
                     <SlidersHorizontal className="w-5 h-5" />
                     <span>Filters</span>
@@ -363,7 +368,8 @@ const Browse = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="btn-primary px-8 py-4 text-lg font-semibold"
+                    className="bg-white text-black px-8 py-4 rounded-xl text-lg font-light hover:bg-gray-100 transition-colors flex items-center gap-2"
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   >
                     Search
                     <ArrowRight className="ml-2 w-5 h-5" />
@@ -383,13 +389,13 @@ const Browse = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="bg-white border-b border-gray-200 shadow-lg"
+            className="bg-gray-950 border-b border-white/10 shadow-lg"
           >
-            <div className="container-custom py-8">
+            <div className="container mx-auto px-6 py-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {/* Price Range */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Price Range</label>
+                  <label className="block text-sm font-light text-gray-300 mb-3" style={{ fontFamily: 'Cormorant Garamond' }}>Price Range</label>
                   <div className="space-y-3">
                     <input
                       type="range"
@@ -402,7 +408,7 @@ const Browse = () => {
                       }))}
                       className="w-full"
                     />
-                    <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex justify-between text-sm text-gray-400" style={{ fontFamily: 'Cormorant Garamond' }}>
                       <span>${filters.priceRange[0].toLocaleString()}</span>
                       <span>${filters.priceRange[1].toLocaleString()}</span>
                     </div>
@@ -411,55 +417,58 @@ const Browse = () => {
 
                 {/* Property Type */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Property Type</label>
+                  <label className="block text-sm font-light text-gray-300 mb-3" style={{ fontFamily: 'Cormorant Garamond' }}>Property Type</label>
                   <select
                     value={filters.propertyType}
                     onChange={(e) => setFilters(prev => ({ ...prev, propertyType: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   >
                     {propertyTypes.map(type => (
-                      <option key={type.value} value={type.value}>{type.label}</option>
+                      <option key={type.value} value={type.value} className="bg-gray-950 text-white">{type.label}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Bedrooms */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Bedrooms</label>
+                  <label className="block text-sm font-light text-gray-300 mb-3" style={{ fontFamily: 'Cormorant Garamond' }}>Bedrooms</label>
                   <select
                     value={filters.bedrooms}
                     onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   >
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
-                    <option value="5">5+</option>
+                    <option value="" className="bg-gray-950">Any</option>
+                    <option value="1" className="bg-gray-950">1+</option>
+                    <option value="2" className="bg-gray-950">2+</option>
+                    <option value="3" className="bg-gray-950">3+</option>
+                    <option value="4" className="bg-gray-950">4+</option>
+                    <option value="5" className="bg-gray-950">5+</option>
                   </select>
                 </div>
 
                 {/* Bathrooms */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Bathrooms</label>
+                  <label className="block text-sm font-light text-gray-300 mb-3" style={{ fontFamily: 'Cormorant Garamond' }}>Bathrooms</label>
                   <select
                     value={filters.bathrooms}
                     onChange={(e) => setFilters(prev => ({ ...prev, bathrooms: e.target.value }))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+                    style={{ fontFamily: 'Cormorant Garamond' }}
                   >
-                    <option value="">Any</option>
-                    <option value="1">1+</option>
-                    <option value="2">2+</option>
-                    <option value="3">3+</option>
-                    <option value="4">4+</option>
+                    <option value="" className="bg-gray-950">Any</option>
+                    <option value="1" className="bg-gray-950">1+</option>
+                    <option value="2" className="bg-gray-950">2+</option>
+                    <option value="3" className="bg-gray-950">3+</option>
+                    <option value="4" className="bg-gray-950">4+</option>
                   </select>
                 </div>
               </div>
 
               {/* Amenities */}
               <div className="mt-8">
-                <label className="block text-sm font-semibold text-gray-700 mb-4">Amenities</label>
+                <label className="block text-sm font-light text-gray-300 mb-4" style={{ fontFamily: 'Cormorant Garamond' }}>Amenities</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                   {amenitiesList.map((amenity) => {
                     const Icon = amenity.icon;
@@ -470,14 +479,15 @@ const Browse = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => toggleAmenity(amenity.name)}
-                        className={`flex items-center space-x-2 px-4 py-3 rounded-xl border transition-all duration-300 ${
+                        className={`flex items-center space-x-2 px-4 py-3 rounded-xl border transition-all duration-300 font-light ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300'
+                            ? 'bg-white text-black border-white'
+                            : 'bg-white/5 text-gray-300 border-white/10 hover:border-white/30'
                         }`}
+                        style={{ fontFamily: 'Cormorant Garamond' }}
                       >
                         <Icon className="w-4 h-4" />
-                        <span className="text-sm font-medium">{amenity.name}</span>
+                        <span className="text-sm">{amenity.name}</span>
                       </motion.button>
                     );
                   })}
@@ -488,13 +498,15 @@ const Browse = () => {
               <div className="flex justify-between items-center mt-8">
                 <button
                   onClick={clearFilters}
-                  className="text-gray-600 hover:text-gray-800 font-medium"
+                  className="text-gray-400 hover:text-white font-light transition-colors"
+                  style={{ fontFamily: 'Cormorant Garamond' }}
                 >
                   Clear All Filters
                 </button>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="btn-primary px-6 py-3"
+                  className="bg-white text-black px-6 py-3 rounded-xl font-light hover:bg-gray-100 transition-colors"
+                  style={{ fontFamily: 'Cormorant Garamond' }}
                 >
                   Apply Filters
                 </button>
@@ -505,42 +517,42 @@ const Browse = () => {
       </AnimatePresence>
 
       {/* Results Section */}
-      <section className="section-padding">
-        <div className="container-custom">
+      <section className="py-20 bg-black">
+        <div className="container mx-auto px-6">
           {/* Results Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                {filteredProperties.length} Premium Properties
+              <h2 className="text-4xl md:text-5xl font-light text-white mb-2" style={{ fontFamily: 'Playfair Display' }}>
+                {filteredProperties.length} Exceptional Properties
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-400 font-light" style={{ fontFamily: 'Cormorant Garamond' }}>
                 {searchQuery && `Results for "${searchQuery}"`}
               </p>
             </div>
             
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               {/* View Mode Toggle */}
-              <div className="flex items-center bg-white rounded-2xl p-1 shadow-lg border border-gray-200">
+              <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    viewMode === 'grid' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600'
+                  className={`p-3 rounded-lg transition-all duration-300 ${
+                    viewMode === 'grid' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   <Grid3X3 className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    viewMode === 'list' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600'
+                  className={`p-3 rounded-lg transition-all duration-300 ${
+                    viewMode === 'list' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   <List className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('map')}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    viewMode === 'map' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:text-blue-600'
+                  className={`p-3 rounded-lg transition-all duration-300 ${
+                    viewMode === 'map' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   <Map className="w-5 h-5" />
@@ -551,10 +563,11 @@ const Browse = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 rounded-2xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg"
+                className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-1 focus:ring-white/30"
+                style={{ fontFamily: 'Cormorant Garamond' }}
               >
                 {sortOptions.map(option => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
+                  <option key={option.value} value={option.value} className="bg-gray-950">{option.label}</option>
                 ))}
               </select>
             </div>
@@ -581,107 +594,65 @@ const Browse = () => {
                   className="group"
                 >
                   <Link href={`/properties/${property.id}`}>
-                    <div className={`property-card hover-lift cursor-pointer ${
-                      viewMode === 'list' ? 'flex' : ''
-                    }`}>
-                      <div className={`relative overflow-hidden ${
-                        viewMode === 'list' ? 'w-80 h-64' : 'h-80'
-                      }`}>
-                        <img
+                    <div className="cursor-pointer">
+                      <div className="relative overflow-hidden aspect-[4/3] mb-6 bg-gray-900">
+                        <motion.img
+                          whileHover={{ scale: 1.08 }}
+                          transition={{ duration: 0.8 }}
                           src={property.images[0]}
                           alt={property.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="w-full h-full object-cover"
                         />
-                        <div className="image-overlay" />
-                        
-                        {/* Property Badge */}
-                        <div className="absolute top-6 left-6">
-                          <span className="luxury-badge">
-                            <Crown className="w-3 h-3 mr-1" />
-                            Premium
-                          </span>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         
                         {/* Favorite Button */}
                         <motion.button
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
-                          className="absolute top-6 right-6 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all duration-300"
+                          className="absolute top-6 right-6 w-10 h-10 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 border border-white/20"
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
                         >
-                          <Heart className="w-5 h-5 text-gray-700" />
+                          <Heart className="w-4 h-4 text-white" />
                         </motion.button>
-                        
-                        {/* Price */}
-                        <div className="absolute bottom-6 left-6">
-                          <div className="glass-effect px-4 py-2 rounded-xl">
-                            <span className="text-2xl font-bold text-white">
-                              ${property.price.toLocaleString()}
-                            </span>
-                            <span className="text-white/80 ml-1">/month</span>
-                          </div>
-                        </div>
                       </div>
                       
-                      <div className={`p-8 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-2xl font-light mb-2 text-white" style={{ fontFamily: 'Playfair Display' }}>
                             {property.title}
                           </h3>
-                          <div className="flex items-center text-amber-500">
-                            <Star className="w-5 h-5 fill-current" />
-                            <span className="ml-1 font-semibold">4.9</span>
+                          <div className="flex items-center gap-2 text-gray-400 mb-4">
+                            <MapPin className="w-4 h-4" />
+                            <span className="font-light" style={{ fontFamily: 'Cormorant Garamond' }}>{property.location}</span>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center text-gray-600 mb-4">
-                          <MapPin className="w-5 h-5 mr-2" />
-                          <span className="font-medium">{property.location}</span>
-                        </div>
-                        
-                        <p className="text-gray-600 mb-6 line-clamp-2">
-                          {property.description}
-                        </p>
-                        
-                        {/* Property Features */}
-                        <div className="flex items-center justify-between mb-6">
-                          <div className="flex items-center space-x-6">
-                            <div className="flex items-center text-gray-600">
-                              <Bed className="w-5 h-5 mr-2" />
-                              <span className="font-medium">{property.bedrooms}</span>
-                            </div>
-                            <div className="flex items-center text-gray-600">
-                              <Bath className="w-5 h-5 mr-2" />
-                              <span className="font-medium">{property.bathrooms}</span>
-                            </div>
-                            <div className="flex items-center text-gray-600">
-                              <Square className="w-5 h-5 mr-2" />
-                              <span className="font-medium">{property.area} sq ft</span>
-                            </div>
+
+                        <div className="flex items-center gap-6 text-sm text-gray-400 border-t border-gray-800 pt-4">
+                          <div className="flex items-center gap-2">
+                            <Bed className="w-4 h-4 text-white/60" />
+                            <span>{property.bedrooms}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Bath className="w-4 h-4 text-white/60" />
+                            <span>{property.bathrooms}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Square className="w-4 h-4 text-white/60" />
+                            <span>{property.area?.toLocaleString()}</span>
                           </div>
                         </div>
-                        
-                        {/* Amenities */}
-                        <div className="flex flex-wrap gap-2 mb-6">
-                          {property.amenities.slice(0, 3).map((amenity, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
-                            >
-                              {amenity}
-                            </span>
-                          ))}
-                          {property.amenities.length > 3 && (
-                            <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
-                              +{property.amenities.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <span className="text-blue-600 font-semibold group-hover:text-blue-700 transition-colors duration-300">
-                            View Details
-                          </span>
-                          <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-300" />
+
+                        <div className="flex items-center justify-between pt-4">
+                          <div>
+                            <div className="text-gray-500 text-sm font-light mb-1" style={{ fontFamily: 'Cormorant Garamond' }}>Starting from</div>
+                            <div className="text-3xl font-light text-white" style={{ fontFamily: 'Playfair Display' }}>
+                              ${property.price.toLocaleString()}
+                              <span className="text-sm text-gray-500">/mo</span>
+                            </div>
+                          </div>
+                          <motion.div whileHover={{ scale: 1.1, rotate: 45 }} whileTap={{ scale: 0.9 }} className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition-colors border border-white/20">
+                            <ArrowRight className="w-5 h-5 text-white" />
+                          </motion.div>
                         </div>
                       </div>
                     </div>
@@ -698,16 +669,17 @@ const Browse = () => {
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-16"
             >
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/10">
                 <Search className="w-12 h-12 text-gray-400" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">No Properties Found</h3>
-              <p className="text-gray-600 mb-8">
+              <h3 className="text-3xl font-light text-white mb-4" style={{ fontFamily: 'Playfair Display' }}>No Properties Found</h3>
+              <p className="text-gray-400 mb-8 font-light" style={{ fontFamily: 'Cormorant Garamond' }}>
                 Try adjusting your search criteria or filters to find more properties.
               </p>
               <button
                 onClick={clearFilters}
-                className="btn-primary px-8 py-3"
+                className="bg-white text-black px-8 py-3 rounded-xl font-light hover:bg-gray-100 transition-colors"
+                style={{ fontFamily: 'Cormorant Garamond' }}
               >
                 Clear All Filters
               </button>
