@@ -4,12 +4,12 @@ import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { 
-  Home, 
-  Building2, 
-  Calendar, 
-  MessageCircle, 
-  Heart, 
+import {
+  Home,
+  Building2,
+  Calendar,
+  MessageCircle,
+  Heart,
   Settings,
   TrendingUp,
   Users,
@@ -22,6 +22,7 @@ import {
   Clock
 } from 'lucide-react';
 import Link from 'next/link';
+import Layout from '../../components/Layout';
 
 
 const Dashboard = () => {
@@ -157,7 +158,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <Layout>
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -288,12 +289,11 @@ const Dashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-xs text-gray-400">{activity.time}</p>
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${
-                          activity.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        <span className={`inline-block px-2 py-1 text-xs rounded-full ${activity.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                           activity.status === 'unread' ? 'bg-red-100 text-red-800' :
-                          activity.status === 'active' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                            activity.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                          }`}>
                           {activity.status}
                         </span>
                       </div>
@@ -352,7 +352,7 @@ const Dashboard = () => {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
