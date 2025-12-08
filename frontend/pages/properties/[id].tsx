@@ -6,13 +6,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { 
-  MapPin, 
-  Star, 
-  Heart, 
-  Share2, 
-  Phone, 
-  Mail, 
+import {
+  MapPin,
+  Star,
+  Heart,
+  Share2,
+  Phone,
+  Mail,
   Calendar,
   Bed,
   Bath,
@@ -29,6 +29,7 @@ import {
   Building2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { sampleProperties } from '../../data/sampleProperties';
 
 // Sample property data
 const sampleProperty: Property = {
@@ -62,6 +63,7 @@ const PropertyDetail = () => {
   const router = useRouter();
   const { id } = router.query;
   const { user, isAuthenticated } = useAuth();
+
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -69,22 +71,25 @@ const PropertyDetail = () => {
   const [showContactForm, setShowContactForm] = useState(false);
   const [bookingDate, setBookingDate] = useState('');
 
-  // Sample images for the property
-  const propertyImages = [
-    'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop',
-    'https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=800&h=600&fit=crop',
-  ];
+  // Get images from property or fallback to empty array
+  const propertyImages = property?.images || [];
 
   useEffect(() => {
     const fetchProperty = async () => {
       if (!id) return;
-      
+
       try {
         setLoading(true);
-        const data = await propertyAPI.getPropertyById(id as string);
-        setProperty(data || sampleProperty);
+        // Try to find in sample properties first
+        const foundProperty = sampleProperties.find(p => p.id === id);
+
+        if (foundProperty) {
+          setProperty(foundProperty);
+        } else {
+          // Fallback to API
+          const data = await propertyAPI.getPropertyById(id as string);
+          setProperty(data || sampleProperty);
+        }
       } catch (error) {
         console.error('Error fetching property:', error);
         setProperty(sampleProperty);
@@ -171,7 +176,7 @@ const PropertyDetail = () => {
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
             </Button>
-            
+
             <div className="flex items-center space-x-4">
               <Button
                 variant="ghost"
@@ -181,7 +186,7 @@ const PropertyDetail = () => {
                 <Share2 className="w-4 h-4" />
                 <span>Share</span>
               </Button>
-              
+
               <Button
                 variant="ghost"
                 onClick={handleFavorite}
@@ -212,7 +217,7 @@ const PropertyDetail = () => {
                   alt={property.title}
                   className="w-full h-full object-cover"
                 />
-                
+
                 {/* Navigation Arrows */}
                 <button
                   onClick={() => setCurrentImageIndex(prev => prev === 0 ? propertyImages.length - 1 : prev - 1)}
@@ -220,7 +225,7 @@ const PropertyDetail = () => {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                
+
                 <button
                   onClick={() => setCurrentImageIndex(prev => (prev + 1) % propertyImages.length)}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors"
@@ -234,9 +239,8 @@ const PropertyDetail = () => {
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                      }`}
+                      className={`w-2 h-2 rounded-full transition-colors ${index === currentImageIndex ? 'bg-white' : 'bg-white/50'
+                        }`}
                     />
                   ))}
                 </div>
@@ -248,9 +252,8 @@ const PropertyDetail = () => {
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${
-                      index === currentImageIndex ? 'border-realestate-500' : 'border-gray-200'
-                    }`}
+                    className={`w-20 h-20 rounded-lg overflow-hidden border-2 transition-colors ${index === currentImageIndex ? 'border-realestate-500' : 'border-gray-200'
+                      }`}
                   >
                     <img
                       src={image}
@@ -310,7 +313,7 @@ const PropertyDetail = () => {
                         <div className="text-sm text-gray-500">Master with en-suite</div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-3">
                       <Bath className="w-5 h-5 text-gray-600" />
                       <div>
@@ -318,7 +321,7 @@ const PropertyDetail = () => {
                         <div className="text-sm text-gray-500">Full bathrooms</div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-3">
                       <Square className="w-5 h-5 text-gray-600" />
                       <div>
@@ -326,7 +329,7 @@ const PropertyDetail = () => {
                         <div className="text-sm text-gray-500">Living area</div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center space-x-3">
                       <Car className="w-5 h-5 text-gray-600" />
                       <div>
@@ -404,7 +407,7 @@ const PropertyDetail = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-realestate-500 focus:border-transparent"
                     placeholder="Select move-in date"
                   />
-                  
+
                   <Button
                     onClick={handleBooking}
                     className="w-full bg-realestate-600 hover:bg-realestate-700"
@@ -412,7 +415,7 @@ const PropertyDetail = () => {
                   >
                     Request Booking
                   </Button>
-                  
+
                   <Button
                     onClick={handleContact}
                     variant="outline"
@@ -444,7 +447,7 @@ const PropertyDetail = () => {
                     <div className="text-sm text-gray-500">Verified Owner</div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Button variant="ghost" className="w-full justify-start">
                     <Phone className="w-4 h-4 mr-2" />
