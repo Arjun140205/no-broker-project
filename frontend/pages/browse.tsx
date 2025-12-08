@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Property } from '../types';
 import Link from 'next/link';
-import { 
-  Search, 
-  Filter, 
-  MapPin, 
-  Star, 
-  Heart, 
-  Bed, 
-  Bath, 
+import {
+  Search,
+  Filter,
+  MapPin,
+  Star,
+  Heart,
+  Bed,
+  Bath,
   Square,
   Crown,
   ArrowRight,
@@ -24,180 +24,14 @@ import {
   Coffee,
   Dumbbell,
   Shield,
-  TreePine
+  TreePine,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
+import Navbar from '../components/Navbar';
+import { sampleProperties } from '../data/sampleProperties';
 
-// Premium sample properties with international locations
-const sampleProperties: Property[] = [
-  {
-    id: '1',
-    title: 'Luxury Penthouse Manhattan',
-    description: 'Stunning 3-bedroom penthouse with panoramic city views, modern amenities, and premium finishes throughout.',
-    price: 8500,
-    location: 'Manhattan, New York',
-    city: 'New York',
-    state: 'New York',
-    type: 'flat',
-    category: 'rent',
-    bedrooms: 3,
-    bathrooms: 2,
-    area: 2200,
-    furnished: 'furnished',
-    amenities: ['WiFi', 'Air Conditioning', 'Parking', 'Gym', 'Concierge', 'Rooftop'],
-    images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner1',
-    createdAt: '2024-01-15',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    title: 'Modern Villa Beverly Hills',
-    description: 'Spectacular 5-bedroom villa with infinity pool, wine cellar, and breathtaking canyon views.',
-    price: 15000,
-    location: 'Beverly Hills, California',
-    city: 'Los Angeles',
-    state: 'California',
-    type: 'villa',
-    category: 'rent',
-    bedrooms: 5,
-    bathrooms: 4,
-    area: 4500,
-    furnished: 'furnished',
-    amenities: ['Pool', 'Wine Cellar', 'Home Theater', 'Gym', 'Garden', 'Security'],
-    images: ['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner2',
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-10'
-  },
-  {
-    id: '3',
-    title: 'Waterfront Condo Miami',
-    description: 'Exclusive 2-bedroom oceanfront condo with private beach access and world-class amenities.',
-    price: 6800,
-    location: 'South Beach, Miami',
-    city: 'Miami',
-    state: 'Florida',
-    type: 'flat',
-    category: 'rent',
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 1800,
-    furnished: 'furnished',
-    amenities: ['Beach Access', 'Spa', 'Valet', 'Restaurant', 'Pool', 'Fitness'],
-    images: ['https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner3',
-    createdAt: '2024-01-08',
-    updatedAt: '2024-01-08'
-  },
-  {
-    id: '4',
-    title: 'Historic Townhouse London',
-    description: 'Beautifully restored Victorian townhouse in prestigious Kensington with private garden.',
-    price: 12000,
-    location: 'Kensington, London',
-    city: 'London',
-    state: 'England',
-    type: 'house',
-    category: 'rent',
-    bedrooms: 4,
-    bathrooms: 3,
-    area: 3200,
-    furnished: 'furnished',
-    amenities: ['Garden', 'Fireplace', 'Study', 'Wine Storage', 'Parking', 'Maid Service'],
-    images: ['https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner4',
-    createdAt: '2024-01-05',
-    updatedAt: '2024-01-05'
-  },
-  {
-    id: '5',
-    title: 'Alpine Chalet Switzerland',
-    description: 'Luxurious mountain retreat with panoramic Alpine views, ski-in/ski-out access, and premium amenities.',
-    price: 18000,
-    location: 'Zermatt, Switzerland',
-    city: 'Zermatt',
-    state: 'Valais',
-    type: 'house',
-    category: 'rent',
-    bedrooms: 6,
-    bathrooms: 5,
-    area: 5000,
-    furnished: 'furnished',
-    amenities: ['Ski Access', 'Fireplace', 'Sauna', 'Wine Cellar', 'Mountain View', 'Concierge'],
-    images: ['https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner5',
-    createdAt: '2024-01-03',
-    updatedAt: '2024-01-03'
-  },
-  {
-    id: '6',
-    title: 'Beachfront Villa Malibu',
-    description: 'Stunning oceanfront estate with private beach, infinity pool, and unobstructed Pacific views.',
-    price: 22000,
-    location: 'Malibu, California',
-    city: 'Malibu',
-    state: 'California',
-    type: 'villa',
-    category: 'rent',
-    bedrooms: 7,
-    bathrooms: 6,
-    area: 6500,
-    furnished: 'furnished',
-    amenities: ['Private Beach', 'Pool', 'Home Theater', 'Gym', 'Wine Cellar', 'Guest House'],
-    images: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner6',
-    createdAt: '2024-01-01',
-    updatedAt: '2024-01-01'
-  },
-  {
-    id: '7',
-    title: 'Penthouse Tokyo',
-    description: 'Ultra-modern penthouse in Shibuya with city skyline views, smart home technology, and luxury finishes.',
-    price: 9500,
-    location: 'Shibuya, Tokyo',
-    city: 'Tokyo',
-    state: 'Tokyo',
-    type: 'flat',
-    category: 'rent',
-    bedrooms: 3,
-    bathrooms: 3,
-    area: 2800,
-    furnished: 'furnished',
-    amenities: ['Smart Home', 'City View', 'Concierge', 'Gym', 'Rooftop Garden', 'Valet'],
-    images: ['https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner7',
-    createdAt: '2024-01-12',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '8',
-    title: 'Tuscan Villa Florence',
-    description: 'Restored 16th-century villa with vineyard, olive groves, and breathtaking countryside views.',
-    price: 14000,
-    location: 'Chianti, Florence',
-    city: 'Florence',
-    state: 'Tuscany',
-    type: 'villa',
-    category: 'rent',
-    bedrooms: 8,
-    bathrooms: 6,
-    area: 7200,
-    furnished: 'furnished',
-    amenities: ['Vineyard', 'Pool', 'Garden', 'Wine Cellar', 'Chef Kitchen', 'Historic Features'],
-    images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop'],
-    available: true,
-    ownerId: 'owner8',
-    createdAt: '2024-01-14',
-    updatedAt: '2024-01-14'
-  }
-];
+
 
 const Browse = () => {
   const [properties, setProperties] = useState<Property[]>(sampleProperties);
@@ -206,6 +40,9 @@ const Browse = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [sortBy, setSortBy] = useState('featured');
+  const [itemsPerPage] = useState(25);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [filters, setFilters] = useState({
     priceRange: [0, 50000],
     bedrooms: '',
@@ -243,20 +80,20 @@ const Browse = () => {
   useEffect(() => {
     let filtered = properties.filter(property => {
       const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           property.description.toLowerCase().includes(searchQuery.toLowerCase());
-      
+        property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.description.toLowerCase().includes(searchQuery.toLowerCase());
+
       const matchesPrice = property.price >= filters.priceRange[0] && property.price <= filters.priceRange[1];
       const matchesBedrooms = !filters.bedrooms || property.bedrooms?.toString() === filters.bedrooms;
       const matchesBathrooms = !filters.bathrooms || property.bathrooms?.toString() === filters.bathrooms;
       const matchesType = !filters.propertyType || property.type === filters.propertyType;
       const matchesLocation = !filters.location || property.location.toLowerCase().includes(filters.location.toLowerCase());
-      
-      const matchesAmenities = filters.amenities.length === 0 || 
+
+      const matchesAmenities = filters.amenities.length === 0 ||
         filters.amenities.every(amenity => property.amenities.includes(amenity));
 
-      return matchesSearch && matchesPrice && matchesBedrooms && matchesBathrooms && 
-             matchesType && matchesLocation && matchesAmenities;
+      return matchesSearch && matchesPrice && matchesBedrooms && matchesBathrooms &&
+        matchesType && matchesLocation && matchesAmenities;
     });
 
     // Sort properties
@@ -279,7 +116,16 @@ const Browse = () => {
     }
 
     setFilteredProperties(filtered);
+    setCurrentPage(1); // Reset to first page when filtering
   }, [properties, searchQuery, filters, sortBy]);
+
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProperties.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredProperties.length / itemsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const toggleAmenity = (amenity: string) => {
     setFilters(prev => ({
@@ -304,6 +150,7 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <Navbar />
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-b from-black via-gray-950 to-black text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
@@ -357,9 +204,8 @@ const Browse = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`flex items-center space-x-2 px-6 py-4 rounded-xl font-light transition-all duration-300 ${
-                      showFilters ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
-                    }`}
+                    className={`flex items-center space-x-2 px-6 py-4 rounded-xl font-light transition-all duration-300 ${showFilters ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20 border border-white/20'
+                      }`}
                     style={{ fontFamily: 'Cormorant Garamond' }}
                   >
                     <SlidersHorizontal className="w-5 h-5" />
@@ -479,11 +325,10 @@ const Browse = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => toggleAmenity(amenity.name)}
-                        className={`flex items-center space-x-2 px-4 py-3 rounded-xl border transition-all duration-300 font-light ${
-                          isSelected
-                            ? 'bg-white text-black border-white'
-                            : 'bg-white/5 text-gray-300 border-white/10 hover:border-white/30'
-                        }`}
+                        className={`flex items-center space-x-2 px-4 py-3 rounded-xl border transition-all duration-300 font-light ${isSelected
+                          ? 'bg-white text-black border-white'
+                          : 'bg-white/5 text-gray-300 border-white/10 hover:border-white/30'
+                          }`}
                         style={{ fontFamily: 'Cormorant Garamond' }}
                       >
                         <Icon className="w-4 h-4" />
@@ -529,31 +374,28 @@ const Browse = () => {
                 {searchQuery && `Results for "${searchQuery}"`}
               </p>
             </div>
-            
+
             <div className="flex items-center space-x-4 mt-4 md:mt-0">
               {/* View Mode Toggle */}
               <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-3 rounded-lg transition-all duration-300 ${
-                    viewMode === 'grid' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
-                  }`}
+                  className={`p-3 rounded-lg transition-all duration-300 ${viewMode === 'grid' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+                    }`}
                 >
                   <Grid3X3 className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-3 rounded-lg transition-all duration-300 ${
-                    viewMode === 'list' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
-                  }`}
+                  className={`p-3 rounded-lg transition-all duration-300 ${viewMode === 'list' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+                    }`}
                 >
                   <List className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('map')}
-                  className={`p-3 rounded-lg transition-all duration-300 ${
-                    viewMode === 'map' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
-                  }`}
+                  className={`p-3 rounded-lg transition-all duration-300 ${viewMode === 'map' ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+                    }`}
                 >
                   <Map className="w-5 h-5" />
                 </button>
@@ -576,14 +418,13 @@ const Browse = () => {
           {/* Properties Grid */}
           <motion.div
             layout
-            className={`grid gap-8 ${
-              viewMode === 'grid' 
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' 
-                : 'grid-cols-1'
-            }`}
+            className={`grid gap-8 ${viewMode === 'grid'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
+              }`}
           >
             <AnimatePresence>
-              {filteredProperties.map((property, index) => (
+              {currentItems.map((property, index) => (
                 <motion.div
                   key={property.id}
                   layout
@@ -604,7 +445,7 @@ const Browse = () => {
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        
+
                         {/* Favorite Button */}
                         <motion.button
                           whileHover={{ scale: 1.1 }}
@@ -615,7 +456,7 @@ const Browse = () => {
                           <Heart className="w-4 h-4 text-white" />
                         </motion.button>
                       </div>
-                      
+
                       <div className="space-y-4">
                         <div>
                           <h3 className="text-2xl font-light mb-2 text-white" style={{ fontFamily: 'Playfair Display' }}>
@@ -661,6 +502,40 @@ const Browse = () => {
               ))}
             </AnimatePresence>
           </motion.div>
+
+          {/* Pagination Controls */}
+          {filteredProperties.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center items-center mt-12 gap-2">
+              <button
+                onClick={() => paginate(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="p-3 rounded-lg bg-white/5 border border-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  className={`w-10 h-10 rounded-lg border transition-all ${currentPage === i + 1
+                      ? 'bg-white text-black border-white'
+                      : 'bg-white/5 text-white border-white/10 hover:bg-white/10'
+                    }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() => paginate(Math.min(totalPages, currentPage + 1))}
+                disabled={currentPage === totalPages}
+                className="p-3 rounded-lg bg-white/5 border border-white/10 text-white disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
 
           {/* No Results */}
           {filteredProperties.length === 0 && (
